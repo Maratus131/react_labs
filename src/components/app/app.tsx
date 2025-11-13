@@ -11,11 +11,11 @@ type AppMainPageProps = {
 
 function App({rentalOffersCount}: AppMainPageProps):JSX.Element {
     return (
-        // <MainPage rentalOffersCount={rentalOffersCount}/>
+        <MainPage rentalOffersCount={rentalOffersCount}/>
         // <FavoritesPage/>
         // <LoginPage/>
         // <OfferPage/>
-        <NotFoundPage/>
+        // <NotFoundPage/>
     )
 }
 
