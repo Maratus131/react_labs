@@ -5,7 +5,7 @@ type MainPageProps = {
     rentalOffersCount: number;
 }
 
-function MainPage({rentalOffersCount}:MainPageProps):JSX.Element {
+function MainPage({ rentalOffersCount }: MainPageProps): JSX.Element {
     return (
         <div className="page page--gray page--main">
             <header className="header">
@@ -96,11 +96,11 @@ function MainPage({rentalOffersCount}:MainPageProps):JSX.Element {
                                 </ul>
                             </form>
                             <div className="cities__places-list places__list tabs__content">
-                                <CitiesCard/>
-                                <CitiesCard/>
-                                <CitiesCard/>
-                                <CitiesCard/>
-                                <CitiesCard/>
+                                <CitiesCard />
+                                <CitiesCard />
+                                <CitiesCard />
+                                <CitiesCard />
+                                <CitiesCard />
                             </div>
                         </section>
                         <div className="cities__right-section">
