@@ -1,15 +1,20 @@
+import { FavoritesCardList } from "../../components/favorites-card-list/favorites-card-list";
 import { FavoritesCard } from "../../components/favorites-card/favorites-card";
+import { Logo } from "../../components/logo/logo";
+import { OffersList } from "../../types/offer";
 
-function FavoritesPage() {
+type FavoritesPageProps = {
+    offersList: OffersList[];
+}
+
+function FavoritesPage({ offersList }: FavoritesPageProps) {
     return (
         <div className="page">
             <header className="header">
                 <div className="container">
                     <div className="header__wrapper">
                         <div className="header__left">
-                            <a className="header__logo-link" href="main.html">
-                                <img className="header__logo" src="img/logo.svg" alt="Rent service logo" width="81" height="41" />
-                            </a>
+                            <Logo />
                         </div>
                         <nav className="header__nav">
                             <ul className="header__nav-list">
@@ -45,11 +50,7 @@ function FavoritesPage() {
                                         </a>
                                     </div>
                                 </div>
-                                <div className="favorites__places">
-                                    <FavoritesCard/>
-
-                                    <FavoritesCard/>
-                                </div>
+                                <FavoritesCardList offersList={offersList}/>
                             </li>
 
                             <li className="favorites__locations-items">
@@ -60,9 +61,7 @@ function FavoritesPage() {
                                         </a>
                                     </div>
                                 </div>
-                                <div className="favorites__places">
-                                    <FavoritesCard/>
-                                </div>
+                                <FavoritesCardList offersList={offersList}/>
                             </li>
                         </ul>
                     </section>

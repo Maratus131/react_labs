@@ -1,18 +1,36 @@
-function FavoritesCard() {
+import { useState } from "react";
+import { AppRoute } from "../../const";
+import { Link } from "react-router-dom";
+
+type FavoritesCardProps = {
+    id: string;
+    title: string;
+    type: string;
+    price: number;
+    isPremium: boolean;
+    previewImage: string;
+    rating: number;
+}
+
+function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating }: FavoritesCardProps) {
+    const ratingPercent = Math.round(rating * 20);
+    const [, setOfferId] = useState('');
     return (
         <article className="favorites__card place-card">
-            <div className="place-card__mark">
-                <span>Premium</span>
-            </div>
+            {isPremium && (
+                <div className="place-card__mark">
+                    <span>Premium</span>
+                </div>
+            )}
             <div className="favorites__image-wrapper place-card__image-wrapper">
-                <a href="#">
-                    <img className="place-card__image" src="img/apartment-small-03.jpg" width="150" height="110" alt="Place image" />
-                </a>
+                <Link to={`${AppRoute.Offer}/${id}`}>
+                    <img className="place-card__image" src={previewImage} width="150" height="110" alt="Place image" />
+                </Link>
             </div>
             <div className="favorites__card-info place-card__info">
                 <div className="place-card__price-wrapper">
                     <div className="place-card__price">
-                        <b className="place-card__price-value">&euro;180</b>
+                        <b className="place-card__price-value">&euro;{price}</b>
                         <span className="place-card__price-text">&#47;&nbsp;night</span>
                     </div>
                     <button className="place-card__bookmark-button place-card__bookmark-button--active button" type="button">
@@ -24,14 +42,14 @@ function FavoritesCard() {
                 </div>
                 <div className="place-card__rating rating">
                     <div className="place-card__stars rating__stars">
-                        <span style={{ width: "80%" }}></span>
+                        <span style={{ width: `${ratingPercent}%` }}></span>
                         <span className="visually-hidden">Rating</span>
                     </div>
                 </div>
                 <h2 className="place-card__name">
-                    <a href="#">Nice, cozy, warm big bed apartment</a>
+                    <a href={`/offer/${id}`}>{title}</a>
                 </h2>
-                <p className="place-card__type">Apartment</p>
+                <p className="place-card__type">{type}</p>
             </div>
         </article>
     );
