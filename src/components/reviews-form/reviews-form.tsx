@@ -3,6 +3,15 @@ import React from "react";
 function ReviewsForm() {
     return (
         <form className="reviews__form form" action="#" method="post">
+            <svg width="0" height="0">
+                <symbol id="icon-star" viewBox="0 0 13 12">
+                    <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M6.5 9.644L10.517 12 9.451 7.56 13 4.573l-4.674-.386L6.5 0 4.673 4.187 0 4.573 3.549 7.56 2.483 12 6.5 9.644z"
+                    />
+                </symbol>
+            </svg>
             <label className="reviews__label form__label" htmlFor="review">
                 Your review
             </label>
@@ -23,7 +32,7 @@ function ReviewsForm() {
                             title="rating"
                         >
                             <svg className="form__star-image" width="37" height="33">
-                                <use xlinkHref="#icon-star"></use>
+                                <use href="#icon-star"></use>
                             </svg>
                         </label>
                     </React.Fragment>
