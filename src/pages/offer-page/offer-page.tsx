@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { NearPlacesCard } from "../../components/near-places-card/near-places-card";
 import { Logo } from "../../components/logo/logo";
-import { FullOffer } from "../../types/offer";
+import { FullOffer, OffersList } from "../../types/offer";
 import { useParams } from "react-router-dom";
 import { NotFoundPage } from "../not-found-page/not-found-page";
 import { ReviewsForm } from "../../components/reviews-form/reviews-form";
 import { Review } from "../../types/reviews";
 import { ReviewsList } from "../../components/reviews-list/reviews-list";
 import Map from "../../components/map/map";
+import { NearPlacesCardList } from "../../components/near-places-list/near-places-list";
 
 type OfferProps = {
     offers: FullOffer[];
@@ -34,6 +34,21 @@ function OfferPage({ offers, reviews: initialReviews }: OfferProps) {
     const nearOffers = offers
         .filter((o) => o.id !== offer.id && o.city.name === offer.city.name)
         .slice(0, 3);
+
+    const nearOffersList: OffersList[] = nearOffers.map((o) => ({
+        id: o.id,
+        title: o.title,
+        type: o.type,
+        price: o.price,
+        isPremium: o.isPremium,
+        rating: o.rating,
+        previewImage: o.images[0],
+        city: o.city,
+        location: o.location,
+        isFavorite: o.isFavorite ?? false
+    }));
+
+
 
     const city = {
         lat: offer.city.location.latitude,
@@ -172,19 +187,16 @@ function OfferPage({ offers, reviews: initialReviews }: OfferProps) {
                         </div>
                     </div>
 
-                    <section className="offer__map map">
-                        <Map city={city} points={points}/>
+                    <section
+                        className="offer__map map">
+                        <Map city={city} points={points} />
                     </section>
                 </section>
 
                 <div className="container">
                     <section className="near-places places">
                         <h2 className="near-places__title">Other places in the neighbourhood</h2>
-                        <div className="near-places__list places__list">
-                            <NearPlacesCard />
-                            <NearPlacesCard />
-                            <NearPlacesCard />
-                        </div>
+                        <NearPlacesCardList offersList={nearOffersList} />
                     </section>
                 </div>
             </main>
