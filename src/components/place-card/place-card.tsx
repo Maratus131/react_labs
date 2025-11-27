@@ -10,9 +10,9 @@ type PlaceCardProps = {
   previewImage: string;
   rating: number;
 
-  /** Новый проп */
-  cardClassName: string;     // cities__card / near-places__card
-  imgWrapperClass: string;   // cities__image-wrapper / near-places__image-wrapper
+
+  cardClassName: string;     
+  imgWrapperClass: string;  
   imgWidth: number;
   imgHeight: number;
 };
@@ -28,7 +28,7 @@ function PlaceCard({
   cardClassName,
   imgWrapperClass,
   imgWidth,
-  imgHeight
+  imgHeight,
 }: PlaceCardProps) {
   const ratingPercent = Math.round(rating * 20);
 

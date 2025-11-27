@@ -1,21 +1,44 @@
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { Logo } from "../../components/logo/logo";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
 import { OffersList } from "../../types/offer";
 import Map from "../../components/map/map";
+import { useAppSelector } from "../../hooks";
+import { getOffersByCity, sortOffersByType } from "../../utils";
+import { CitiesList } from "../../components/cities-list/cities-list";
+import { SortOffer } from "../../types/sort";
+import { SortOptions } from "../../components/sort-options/sort-options";
 
-type MainPageProps = {
-    rentalOffersCount: number;
-    offersList: OffersList[];
-}
+function MainPage() {
+    const [activeSort, setActiveSort] = useState<SortOffer>('Popular');
 
-function MainPage({ rentalOffersCount, offersList }: MainPageProps): JSX.Element {
-    const amsterdamOffers = offersList.filter((o) => o.city.name === 'Amsterdam');
-    const city = amsterdamOffers.length > 0
-        ? { lat: amsterdamOffers[0].city.location.latitude, lng: amsterdamOffers[0].city.location.longitude, zoom: amsterdamOffers[0].city.location.zoom }
-        : { lat: 52.3702, lng: 4.8952, zoom: 12 };
+    const selectedCity = useAppSelector((state) => state.city);
+    const offersList = useAppSelector((state) => state.offers);
 
-    const points = amsterdamOffers.map((o) => ({ id: o.id, title: o.title, lat: o.location.latitude, lng: o.location.longitude }));
+    const selectedCityOffers = (selectedCity
+        ? getOffersByCity(selectedCity.name, offersList)
+        : []) || [];
+
+    const rentalOffersCount = selectedCityOffers?.length;
+
+
+    const defaultCityLocation = { lat: 52.3702, lng: 4.8952, zoom: 12 };
+
+    const city = selectedCity
+        ? {
+            lat: selectedCity.location.latitude,
+            lng: selectedCity.location.longitude,
+            zoom: selectedCity.location.zoom,
+        }
+        : defaultCityLocation;
+
+    const points = selectedCityOffers.map((o) => ({
+        id: o.id,
+        title: o.title,
+        lat: o.location.latitude,
+        lng: o.location.longitude,
+    }));
+
 
     return (
         <div className="page page--gray page--main">
@@ -50,61 +73,17 @@ function MainPage({ rentalOffersCount, offersList }: MainPageProps): JSX.Element
                 <h1 className="visually-hidden">Cities</h1>
                 <div className="tabs">
                     <section className="locations container">
-                        <ul className="locations__list tabs__list">
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item" href="#">
-                                    <span>Paris</span>
-                                </a>
-                            </li>
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item" href="#">
-                                    <span>Cologne</span>
-                                </a>
-                            </li>
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item" href="#">
-                                    <span>Brussels</span>
-                                </a>
-                            </li>
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item tabs__item--active">
-                                    <span>Amsterdam</span>
-                                </a>
-                            </li>
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item" href="#">
-                                    <span>Hamburg</span>
-                                </a>
-                            </li>
-                            <li className="locations__item">
-                                <a className="locations__item-link tabs__item" href="#">
-                                    <span>Dusseldorf</span>
-                                </a>
-                            </li>
-                        </ul>
+                        <CitiesList selectedCity={selectedCity} />
                     </section>
                 </div>
                 <div className="cities">
                     <div className="cities__places-container container">
                         <section className="cities__places places">
                             <h2 className="visually-hidden">Places</h2>
-                            <b className="places__found">{rentalOffersCount} places to stay in Amsterdam</b>
-                            <form className="places__sorting" action="#" method="get">
-                                <span className="places__sorting-caption">Sort by</span>
-                                <span className="places__sorting-type" tabIndex={0}>
-                                    Popular
-                                    <svg className="places__sorting-arrow" width="7" height="4">
-                                        <use href="#icon-arrow-select"></use>
-                                    </svg>
-                                </span>
-                                <ul className="places__options places__options--custom places__options--opened">
-                                    <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                                    <li className="places__option" tabIndex={0}>Price: low to high</li>
-                                    <li className="places__option" tabIndex={0}>Price: high to low</li>
-                                    <li className="places__option" tabIndex={0}>Top rated first</li>
-                                </ul>
-                            </form>
-                            <CitiesCardList offersList={offersList} />
+                            <SortOptions activeSorting={activeSort} onChange={(newSorting) => setActiveSort(newSorting)} />
+                            <b className="places__found">{rentalOffersCount} places to stay in {selectedCity?.name}</b>
+                            <CitiesCardList offersList={sortOffersByType(selectedCityOffers, activeSort)}
+                            />
                         </section>
                         <div className="cities__right-section">
                             <section className="cities__map map">
