@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { NearPlacesCard } from "../../components/near-places-card/near-places-card";
 import { Logo } from "../../components/logo/logo";
 import { FullOffer } from "../../types/offer";
 import { useParams } from "react-router-dom";
 import { NotFoundPage } from "../not-found-page/not-found-page";
 import { ReviewsForm } from "../../components/reviews-form/reviews-form";
+import { Review } from "../../types/reviews";
+import { ReviewsList } from "../../components/reviews-list/reviews-list";
+import Map from "../../components/map/map";
 
 type OfferProps = {
     offers: FullOffer[];
+    reviews: Review[];
 };
 
-function OfferPage({ offers }: OfferProps) {
+function OfferPage({ offers, reviews: initialReviews }: OfferProps) {
+    const [reviews, setReviews] = useState<Review[]>(initialReviews);
+
     const { id } = useParams();
     const offer = offers.find((o) => o.id === id);
 
@@ -21,7 +27,35 @@ function OfferPage({ offers }: OfferProps) {
 
     const ratingPercent = Math.round(offer.rating * 20);
 
-    
+    const handleAddReview = (newReview: Review) => {
+        setReviews((prev) => [newReview, ...prev]);
+    };
+
+    const nearOffers = offers
+        .filter((o) => o.id !== offer.id && o.city.name === offer.city.name)
+        .slice(0, 3);
+
+    const city = {
+        lat: offer.city.location.latitude,
+        lng: offer.city.location.longitude,
+        zoom: offer.city.location.zoom
+    };
+
+    const points = [
+        {
+            id: offer.id,
+            title: offer.title,
+            lat: offer.location.latitude,
+            lng: offer.location.longitude
+        },
+        ...nearOffers.map((o) => ({
+            id: o.id,
+            title: o.title,
+            lat: o.location.latitude,
+            lng: o.location.longitude
+        }))
+    ];
+
     return (
         <div className="page">
             <header className="header">
@@ -131,48 +165,16 @@ function OfferPage({ offers }: OfferProps) {
                             </div>
 
                             <section className="offer__reviews reviews">
-                                <h2 className="reviews__title">
-                                    Reviews &middot; <span className="reviews__amount">1</span>
-                                </h2>
-                                <ul className="reviews__list">
-                                    <li className="reviews__item">
-                                        <div className="reviews__user user">
-                                            <div className="reviews__avatar-wrapper user__avatar-wrapper">
-                                                <img
-                                                    className="reviews__avatar user__avatar"
-                                                    src="/img/avatar-max.jpg"
-                                                    width="54"
-                                                    height="54"
-                                                    alt="Reviews avatar"
-                                                />
-                                            </div>
-                                            <span className="reviews__user-name">Max</span>
-                                        </div>
-                                        <div className="reviews__info">
-                                            <div className="reviews__rating rating">
-                                                <div className="reviews__stars rating__stars">
-                                                    <span style={{ width: "80%" }}></span>
-                                                    <span className="visually-hidden">Rating</span>
-                                                </div>
-                                            </div>
-                                            <p className="reviews__text">
-                                                A quiet cozy and picturesque that hides behind a river.
-                                            </p>
-                                            <time
-                                                className="reviews__time"
-                                                dateTime="2019-04-24"
-                                            >
-                                                April 2019
-                                            </time>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <ReviewsForm/>
+
+                                <ReviewsList reviews={reviews} />
+                                <ReviewsForm onAddReview={handleAddReview} />
                             </section>
                         </div>
                     </div>
 
-                    <section className="offer__map map"></section>
+                    <section className="offer__map map">
+                        <Map city={city} points={points}/>
+                    </section>
                 </section>
 
                 <div className="container">

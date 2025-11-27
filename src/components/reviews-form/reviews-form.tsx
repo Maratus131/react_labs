@@ -1,8 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import { Review } from "../../types/reviews";
 
-function ReviewsForm() {
+
+type ReviewsFormProps = {
+    onAddReview: (review: Review) => void;
+}
+
+function ReviewsForm({ onAddReview }: ReviewsFormProps) {
+
+    const [review, setReview] = useState("");
+    const [rating, setRating] = useState(0);
+
+    const handleSubmitReview = (evt: React.FormEvent<HTMLFormElement>) => {
+        evt.preventDefault();
+        if (rating === 0 || review.length > 50) return;
+
+        const newReview: Review = {
+            id: crypto.randomUUID(),
+            rating,
+            comment: review,
+            date: new Date().toISOString(),
+            user: {
+                name: 'You',
+                avatarUrl: "/img/avatar.svg",
+                isPro: false
+            }
+        };
+        onAddReview(newReview);
+
+        setReview("");
+        setRating(0);
+    };
+
     return (
-        <form className="reviews__form form" action="#" method="post">
+        <form className="reviews__form form" action="#" method="post" onSubmit={handleSubmitReview}>
             <svg width="0" height="0">
                 <symbol id="icon-star" viewBox="0 0 13 12">
                     <path
@@ -25,6 +56,8 @@ function ReviewsForm() {
                             value={num}
                             id={`${num}-stars`}
                             type="radio"
+                            checked={rating === num}
+                            onChange={() => setRating(num)}
                         />
                         <label
                             htmlFor={`${num}-stars`}
@@ -44,6 +77,8 @@ function ReviewsForm() {
                 id="review"
                 name="review"
                 placeholder="Tell how was your stay..."
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
             ></textarea>
 
             <div className="reviews__button-wrapper">
@@ -56,7 +91,7 @@ function ReviewsForm() {
                 <button
                     className="reviews__submit form__submit button"
                     type="submit"
-                    disabled
+                    disabled={rating === 0 || review.length > 50}
                 >
                     Submit
                 </button>

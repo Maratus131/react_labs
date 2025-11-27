@@ -2,6 +2,7 @@ import { JSX } from "react";
 import { Logo } from "../../components/logo/logo";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
 import { OffersList } from "../../types/offer";
+import Map from "../../components/map/map";
 
 type MainPageProps = {
     rentalOffersCount: number;
@@ -9,6 +10,13 @@ type MainPageProps = {
 }
 
 function MainPage({ rentalOffersCount, offersList }: MainPageProps): JSX.Element {
+    const amsterdamOffers = offersList.filter((o) => o.city.name === 'Amsterdam');
+    const city = amsterdamOffers.length > 0
+        ? { lat: amsterdamOffers[0].city.location.latitude, lng: amsterdamOffers[0].city.location.longitude, zoom: amsterdamOffers[0].city.location.zoom }
+        : { lat: 52.3702, lng: 4.8952, zoom: 12 };
+
+    const points = amsterdamOffers.map((o) => ({ id: o.id, title: o.title, lat: o.location.latitude, lng: o.location.longitude }));
+
     return (
         <div className="page page--gray page--main">
             <header className="header">
@@ -99,7 +107,9 @@ function MainPage({ rentalOffersCount, offersList }: MainPageProps): JSX.Element
                             <CitiesCardList offersList={offersList} />
                         </section>
                         <div className="cities__right-section">
-                            <section className="cities__map map"></section>
+                            <section className="cities__map map">
+                                <Map city={city} points={points} />
+                            </section>
                         </div>
                     </div>
                 </div>

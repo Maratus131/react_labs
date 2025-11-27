@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './components/app/app'
 import { Setting } from './const'
 import { offers } from './mocks/offers'
+import { reviews } from './mocks/reviews'
 import { offersList } from './mocks/offers-list'
 
 createRoot(document.getElementById('root')!).render(
@@ -10,6 +11,7 @@ createRoot(document.getElementById('root')!).render(
     <App rentalOffersCount={Setting.rentOffersCount}
       offersList={offersList}
       offers={offers}
+      reviews={reviews}
     />
   </StrictMode>,
 )
