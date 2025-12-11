@@ -1,4 +1,4 @@
-import {useEffect, useState, useRef} from 'react';
+import { useEffect, useState, useRef } from 'react';
 import leaflet from 'leaflet';
 
 type City = {
@@ -13,6 +13,7 @@ export default function useMap(mapRef: React.RefObject<HTMLDivElement | null>, c
 
   useEffect(() => {
     if (mapRef.current !== null && !isRenderedRef.current) {
+      // Инициализация карты (выполняется 1 раз)
       const instance = leaflet.map(mapRef.current, {
         center: [city.lat, city.lng],
         zoom: city.zoom,
@@ -29,10 +30,12 @@ export default function useMap(mapRef: React.RefObject<HTMLDivElement | null>, c
 
       setMap(instance);
       isRenderedRef.current = true;
-    } else if (mapRef.current !== null && map) {
+    } else if (map) {
+      // Обновление вьюпорта. 
+      // Сработает ТОЛЬКО если координаты или дефолтный зум города реально изменились.
       map.setView([city.lat, city.lng], city.zoom);
     }
-  }, [mapRef, city, map]);
+  }, [mapRef, map, city.lat, city.lng, city.zoom]); // <--- Изменили зависимости здесь!
 
   return map;
 }

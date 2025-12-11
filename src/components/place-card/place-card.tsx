@@ -11,10 +11,13 @@ type PlaceCardProps = {
   rating: number;
 
 
-  cardClassName: string;     
-  imgWrapperClass: string;  
+  cardClassName: string;
+  imgWrapperClass: string;
   imgWidth: number;
   imgHeight: number;
+
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 };
 
 function PlaceCard({
@@ -29,11 +32,17 @@ function PlaceCard({
   imgWrapperClass,
   imgWidth,
   imgHeight,
+  onMouseEnter,
+  onMouseLeave
 }: PlaceCardProps) {
   const ratingPercent = Math.round(rating * 20);
 
   return (
-    <article className={`${cardClassName} place-card`}>
+    <article
+      className={`${cardClassName} place-card`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       {isPremium && (
         <div className="place-card__mark">
           <span>Premium</span>

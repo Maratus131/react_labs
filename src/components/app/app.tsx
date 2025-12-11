@@ -18,21 +18,21 @@ type AppMainPageProps = {
     reviews: Review[];
 }
 
-function App({ rentalOffersCount, offers, offersList, reviews }: AppMainPageProps): JSX.Element {
+function App({ offers, offersList, reviews }: AppMainPageProps): JSX.Element {
     return (
         <BrowserRouter>
             <Routes>
                 <Route
                     path={AppRoute.Main}
-                    element={<MainPage rentalOffersCount={rentalOffersCount} offersList={offersList} />}
+                    element={<MainPage />}
                 />
                 <Route
                     path={AppRoute.Login}
                     element={<LoginPage />}
                 />
                 <Route
-                    path={`${AppRoute.Offer}/:id`} 
-                    element={<OfferPage offers={offers} reviews={reviews}/>}
+                    path={`${AppRoute.Offer}/:id`}
+                    element={<OfferPage offers={offers} reviews={reviews} />}
                 />
                 <Route
                     path={AppRoute.Favorites}
@@ -40,7 +40,7 @@ function App({ rentalOffersCount, offers, offersList, reviews }: AppMainPageProp
                         <PrivateRoute
                             authorizationStatus={AuthorizationStatus.Auth}
                         >
-                            <FavoritesPage offersList={offersList}/>
+                            <FavoritesPage offersList={offersList} />
                         </PrivateRoute>
                     }
                 />

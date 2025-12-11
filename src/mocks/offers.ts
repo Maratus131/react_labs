@@ -11,9 +11,9 @@ const offers: FullOffer[] = [
         images: ['/img/apartment-01.jpg', '/img/apartment-01.jpg', '/img/apartment-01.jpg', '/img/apartment-01.jpg', '/img/apartment-01.jpg', '/img/apartment-01.jpg'],
         city: {
             name: 'Paris',
-            location: { latitude: 48.8561, longitude: 2.351499, zoom: 13 }
+            location: { latitude: 48.8561, longitude: 2.351499, zoom: 18 }
         },
-        location: { latitude: 48.8568, longitude: 2.342499, zoom: 16 },
+        location: { latitude: 48.8568, longitude: 2.342499, zoom: 18 },
         goods: [
             'Heating',
             'Wi-Fi',

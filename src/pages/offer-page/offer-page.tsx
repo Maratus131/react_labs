@@ -48,8 +48,6 @@ function OfferPage({ offers, reviews: initialReviews }: OfferProps) {
         isFavorite: o.isFavorite ?? false
     }));
 
-
-
     const city = {
         lat: offer.city.location.latitude,
         lng: offer.city.location.longitude,

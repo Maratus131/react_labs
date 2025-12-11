@@ -1,15 +1,16 @@
-import { JSX, useState } from "react";
+import { useState } from "react";
 import { Logo } from "../../components/logo/logo";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
-import { OffersList } from "../../types/offer";
 import Map from "../../components/map/map";
 import { useAppSelector } from "../../hooks";
-import { getOffersByCity, sortOffersByType } from "../../utils";
+import { getFavoritesLength, getOffersByCity, sortOffersByType } from "../../utils";
 import { CitiesList } from "../../components/cities-list/cities-list";
 import { SortOffer } from "../../types/sort";
 import { SortOptions } from "../../components/sort-options/sort-options";
+import { Link } from "react-router-dom";
 
 function MainPage() {
+    const [selectedOfferId, setSelectedOfferId] = useState<string | undefined>(undefined);
     const [activeSort, setActiveSort] = useState<SortOffer>('Popular');
 
     const selectedCity = useAppSelector((state) => state.city);
@@ -21,14 +22,23 @@ function MainPage() {
 
     const rentalOffersCount = selectedCityOffers?.length;
 
+    const defaultCityLocation = { lat: 52.3702, lng: 4.8952, zoom: 19 };
 
-    const defaultCityLocation = { lat: 52.3702, lng: 4.8952, zoom: 12 };
+    const activeCityLat =
+        selectedCityOffers[0]?.location.latitude ??
+        selectedCity?.location.latitude ??
+        defaultCityLocation.lat;
+
+    const activeCityLng =
+        selectedCityOffers[0]?.location.longitude ??
+        selectedCity?.location.longitude ??
+        defaultCityLocation.lng;
 
     const city = selectedCity
         ? {
-            lat: selectedCity.location.latitude,
-            lng: selectedCity.location.longitude,
-            zoom: selectedCity.location.zoom,
+            lat: activeCityLat,
+            lng: activeCityLng,
+            zoom: 13,
         }
         : defaultCityLocation;
 
@@ -39,7 +49,11 @@ function MainPage() {
         lng: o.location.longitude,
     }));
 
+    const handleListItemHover = (offerId: string | undefined) => {
+        setSelectedOfferId(offerId);
+    };
 
+    const favoriteLength = getFavoritesLength(offersList);
     return (
         <div className="page page--gray page--main">
             <header className="header">
@@ -55,7 +69,10 @@ function MainPage() {
                                         <div className="header__avatar-wrapper user__avatar-wrapper">
                                         </div>
                                         <span className="header__user-name user__name">Myemail@gmail.com</span>
-                                        <span className="header__favorite-count">3</span>
+                                        <Link to="/favorites">
+                                            <span className="header__favorite-count">{favoriteLength}</span>
+                                        </Link>
+
                                     </a>
                                 </li>
                                 <li className="header__nav-item">
@@ -82,12 +99,14 @@ function MainPage() {
                             <h2 className="visually-hidden">Places</h2>
                             <SortOptions activeSorting={activeSort} onChange={(newSorting) => setActiveSort(newSorting)} />
                             <b className="places__found">{rentalOffersCount} places to stay in {selectedCity?.name}</b>
-                            <CitiesCardList offersList={sortOffersByType(selectedCityOffers, activeSort)}
+                            <CitiesCardList
+                                offersList={sortOffersByType(selectedCityOffers, activeSort)}
+                                onListItemHover={handleListItemHover}
                             />
                         </section>
                         <div className="cities__right-section">
                             <section className="cities__map map">
-                                <Map city={city} points={points} />
+                                <Map city={city} points={points} selectedPointId={selectedOfferId} />
                             </section>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
-import { CityOffer, FullOffer, OffersList } from "../types/offer";
+import { CityOffer, OffersList } from "../types/offer";
 
 const changeCity = createAction('offers/changeCity', (city: CityOffer) => ({
     payload: city
