@@ -2,11 +2,13 @@ package com.example.server.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Table(name = "reviews")
 public class Review {
     @Id
@@ -24,11 +26,11 @@ public class Review {
     @Range(min = 1, max = 5)
     private int rating;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "offer_id", nullable = false)
     private Offer offer;
 

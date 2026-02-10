@@ -1,6 +1,9 @@
 package com.example.server.enums;
 
 
+import lombok.Getter;
+
+@Getter
 public enum TypeEnum {
     APARTMENT("Apartment"),
     HOUSE("House"),
@@ -11,10 +14,6 @@ public enum TypeEnum {
 
     TypeEnum(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static TypeEnum fromValue(String value) {

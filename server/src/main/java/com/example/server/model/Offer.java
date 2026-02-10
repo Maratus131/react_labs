@@ -81,7 +81,7 @@ public class Offer {
     @Column(nullable = false)
     private float longitude;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
     private User author;
 

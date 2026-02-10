@@ -1,7 +1,9 @@
 package com.example.server.enums;
 
 import jakarta.persistence.EnumeratedValue;
+import lombok.Getter;
 
+@Getter
 public enum CityEnum {
     PARIS("Paris"),
     COLOGNE("Cologne"),
@@ -15,10 +17,6 @@ public enum CityEnum {
 
     CityEnum(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static CityEnum fromValue(String value) {

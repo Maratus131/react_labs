@@ -1,7 +1,9 @@
 package com.example.server.enums;
 
 import jakarta.persistence.EnumeratedValue;
+import lombok.Getter;
 
+@Getter
 public enum FeaturesEnum {
     BREAKFAST("Breakfast"),
     AIR_CONDITIONING("Air conditioning"),
@@ -18,7 +20,4 @@ public enum FeaturesEnum {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
 }
