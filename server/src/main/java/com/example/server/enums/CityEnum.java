@@ -9,7 +9,7 @@ public enum CityEnum {
     COLOGNE("Cologne"),
     BRUSSELS("Brussels"),
     AMSTERDAM("Amsterdam"),
-    HAMBURG("HAMBURG"),
+    HAMBURG("Hamburg"),
     DUSSELDORF("Dusseldorf");
 
     @EnumeratedValue
@@ -21,7 +21,7 @@ public enum CityEnum {
 
     public static CityEnum fromValue(String value) {
         for (CityEnum city : values()) {
-            if (city.getValue().equals(value)) {
+            if (city.getValue().equalsIgnoreCase(value)) {
                 return city;
             }
         }

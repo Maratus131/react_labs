@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDateTime;
@@ -33,7 +34,8 @@ public class Offer {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false, columnDefinition = "timestamp default current_timestamp")
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime publishDate;
 
     @Convert(converter = CityEnumConverter.class)
@@ -48,6 +50,9 @@ public class Offer {
 
     @Column(nullable = false)
     private boolean isPremium;
+
+    @Column(nullable = false)
+    private boolean isFavorite;
 
     @Column(nullable = false)
     private double rating;

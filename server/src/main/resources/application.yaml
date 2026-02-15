@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 30MB
   config:
     import: optional:file:.env[.properties]
   application:
@@ -10,12 +14,14 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
     show-sql: true
 
 server:
+  tomcat:
+    max-part-count: 50
   port: 5000
 

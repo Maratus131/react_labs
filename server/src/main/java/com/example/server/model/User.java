@@ -1,5 +1,6 @@
 package com.example.server.model;
 
+import com.example.server.converter.UserTypeConverter;
 import com.example.server.enums.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -28,7 +29,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = UserTypeConverter.class)
     @Column(nullable = false)
     private UserType userType;
 

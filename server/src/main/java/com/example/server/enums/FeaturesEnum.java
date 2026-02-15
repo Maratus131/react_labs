@@ -20,4 +20,13 @@ public enum FeaturesEnum {
         this.value = value;
     }
 
+    public static FeaturesEnum fromValue(String value) {
+        for (FeaturesEnum feature : values()) {
+            if (feature.getValue().equalsIgnoreCase(value)) {
+                return feature;
+            }
+        }
+        return null;
+    }
+
 }
