@@ -1,7 +1,7 @@
 package com.example.server.controller;
 
 import com.example.server.dto.CreateOfferDtoRequest;
-import com.example.server.dto.CreateOfferDtoResponse;
+import com.example.server.dto.OfferDtoResponse;
 import com.example.server.model.Offer;
 import com.example.server.service.OfferService;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +21,17 @@ public class OfferController {
     private final OfferService offerService;
 
     @GetMapping
-    public List<Offer> getOffers() {
+    public List<OfferDtoResponse> getOffers() {
         return offerService.getAllOffers();
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CreateOfferDtoResponse> createOffer(
+    public ResponseEntity<OfferDtoResponse> createOffer(
             @ModelAttribute CreateOfferDtoRequest request,
             @RequestParam("previewImage") MultipartFile previewImage,
             @RequestParam(value = "photos", required = false) List<MultipartFile> photos
     ) throws IOException {
-        CreateOfferDtoResponse response =
+        OfferDtoResponse response =
                 offerService.createOffer(request, previewImage, photos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -20,6 +20,9 @@ spring:
         format_sql: true
     show-sql: true
 
+app:
+  base-url: http://localhost:5000
+
 server:
   tomcat:
     max-part-count: 50

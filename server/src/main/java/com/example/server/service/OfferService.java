@@ -1,11 +1,13 @@
 package com.example.server.service;
 
 import com.example.server.dto.CreateOfferDtoRequest;
-import com.example.server.dto.CreateOfferDtoResponse;
+import com.example.server.dto.OfferDtoResponse;
+import com.example.server.enums.CityEnum;
 import com.example.server.model.Offer;
 import com.example.server.repository.OfferRepository;
 import com.example.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,16 +23,22 @@ public class OfferService {
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
 
-    public List<Offer> getAllOffers() {
-        return offerRepository.findAll();
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    public List<OfferDtoResponse> getAllOffers() {
+        List<Offer> offers = offerRepository.findAll();
+        return offers
+                .stream()
+                .map(this::mapToOfferDtoResponse)
+                .toList();
     }
 
-    public CreateOfferDtoResponse createOffer(
+    public OfferDtoResponse createOffer(
             CreateOfferDtoRequest request,
             MultipartFile previewImage,
             List<MultipartFile> photos)
-    throws IOException
-    {
+            throws IOException {
         if (previewImage == null || previewImage.isEmpty()) {
             throw new RuntimeException("Preview image is required");
         }
@@ -45,7 +53,7 @@ public class OfferService {
 
         if (photos != null) {
             for (MultipartFile photo : photos) {
-                if(!photo.isEmpty()) {
+                if (!photo.isEmpty()) {
                     photoPaths.add(fileStorageService.saveImage(photo, "offers"));
                 }
             }
@@ -74,11 +82,11 @@ public class OfferService {
 
         offerRepository.save(offer);
 
-        return mapToCreateOfferDtoResponse(offer);
+        return mapToOfferDtoResponse(offer);
     }
 
-    public CreateOfferDtoResponse mapToCreateOfferDtoResponse(Offer offer) {
-        CreateOfferDtoResponse response = new CreateOfferDtoResponse();
+    public OfferDtoResponse mapToOfferDtoResponse(Offer offer) {
+        OfferDtoResponse response = new OfferDtoResponse();
         response.setId(offer.getId());
         response.setTitle(offer.getTitle());
         response.setDescription(offer.getDescription());
@@ -86,19 +94,47 @@ public class OfferService {
         response.setPrice(offer.getPrice());
         response.setRooms(offer.getRooms());
         response.setGuests(offer.getGuests());
-        response.setPreviewImageUrl(offer.getPreviewImage());
+        response.setPreviewImageUrl(prepareUrl(offer.getPreviewImage()));
         response.setFeatures(offer.getFeatures());
         response.setCommentsCount(offer.getCommentsCount());
-        response.setLatitude(offer.getLatitude());
-        response.setLongitude(offer.getLongitude());
+
         response.setPremium(offer.isPremium());
         response.setFavorite(offer.isFavorite());
         response.setUserId(offer.getAuthor().getId());
         response.setType(offer.getType());
-        response.setCity(offer.getCityEnum());
         response.setRating(offer.getRating());
-        response.setPhotosUrl(offer.getPhotos());
+        if (offer.getPhotos() != null) {
+            response.setPhotosUrl(offer.getPhotos().stream()
+                    .map(this::prepareUrl)
+                    .toList());
+        }
+
+        CityEnum cityEnum = offer.getCityEnum();
+        if (cityEnum != null) {
+            OfferDtoResponse.CityDto cityDto = new OfferDtoResponse.CityDto();
+            cityDto.setName(cityEnum.getValue());
+            cityDto.setLocation(new OfferDtoResponse.LocationDto(
+                    cityEnum.getLatitude(),
+                    cityEnum.getLongitude(),
+                    cityEnum.getZoom()
+            ));
+            response.setCity(cityDto);
+        }
+
+        response.setLocation(new OfferDtoResponse.LocationDto(
+                offer.getLatitude(),
+                offer.getLongitude(),
+                13
+        ));
 
         return response;
+    }
+
+    private String prepareUrl(String imagePath) {
+        if (imagePath == null || imagePath.isEmpty() || imagePath.startsWith("http")) {
+            return imagePath;
+        }
+        String path = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
+        return baseUrl + "/static" + path;
     }
 }
