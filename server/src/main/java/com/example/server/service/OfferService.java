@@ -1,8 +1,11 @@
 package com.example.server.service;
 
 import com.example.server.dto.CreateOfferDtoRequest;
+import com.example.server.dto.FullOfferDto;
 import com.example.server.dto.OfferDtoResponse;
 import com.example.server.enums.CityEnum;
+import com.example.server.exceptions.OfferNotFoundException;
+import com.example.server.exceptions.UserNotFoundException;
 import com.example.server.model.Offer;
 import com.example.server.repository.OfferRepository;
 import com.example.server.repository.UserRepository;
@@ -22,6 +25,7 @@ public class OfferService {
     private final OfferRepository offerRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -32,6 +36,12 @@ public class OfferService {
                 .stream()
                 .map(this::mapToOfferDtoResponse)
                 .toList();
+    }
+
+    public FullOfferDto getFullOffer(int id) {
+        Offer offer = offerRepository.findById(id).orElseThrow(() -> new OfferNotFoundException(id));
+
+        return mapToFullOfferDto(offer);
     }
 
     public OfferDtoResponse createOffer(
@@ -78,7 +88,7 @@ public class OfferService {
         offer.setLatitude(request.getLatitude());
         offer.setLongitude(request.getLongitude());
         offer.setFavorite(request.isFavorite());
-        offer.setAuthor(userRepository.getUsersById(request.getUserId()));
+        offer.setAuthor(userRepository.findById(request.getUserId()).orElseThrow(() -> new UserNotFoundException(request.getUserId())));
 
         offerRepository.save(offer);
 
@@ -94,7 +104,7 @@ public class OfferService {
         response.setPrice(offer.getPrice());
         response.setRooms(offer.getRooms());
         response.setGuests(offer.getGuests());
-        response.setPreviewImageUrl(prepareUrl(offer.getPreviewImage()));
+        response.setPreviewImageUrl(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
         response.setFeatures(offer.getFeatures());
         response.setCommentsCount(offer.getCommentsCount());
 
@@ -105,7 +115,7 @@ public class OfferService {
         response.setRating(offer.getRating());
         if (offer.getPhotos() != null) {
             response.setPhotosUrl(offer.getPhotos().stream()
-                    .map(this::prepareUrl)
+                    .map(photo -> fileStorageService.prepareUrl(baseUrl, photo))
                     .toList());
         }
 
@@ -130,11 +140,49 @@ public class OfferService {
         return response;
     }
 
-    private String prepareUrl(String imagePath) {
-        if (imagePath == null || imagePath.isEmpty() || imagePath.startsWith("http")) {
-            return imagePath;
+    public FullOfferDto mapToFullOfferDto(Offer offer) {
+        FullOfferDto fullOffer = new FullOfferDto();
+        fullOffer.setId(offer.getId());
+        fullOffer.setTitle(offer.getTitle());
+        fullOffer.setDescription(offer.getDescription());
+        fullOffer.setPublishDate(offer.getPublishDate());
+        fullOffer.setPrice(offer.getPrice());
+        fullOffer.setRooms(offer.getRooms());
+        fullOffer.setGuests(offer.getGuests());
+        fullOffer.setPreviewImageUrl(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
+        fullOffer.setFeatures(offer.getFeatures());
+        fullOffer.setCommentsCount(offer.getCommentsCount());
+
+        fullOffer.setRating(offer.getRating());
+        fullOffer.setFavorite(offer.isFavorite());
+        fullOffer.setPremium(offer.isPremium());
+        fullOffer.setAuthor(userService.mapToDto(offer.getAuthor()));
+        fullOffer.setType(offer.getType());
+
+        if (offer.getPhotos() != null) {
+            fullOffer.setPhotosUrl(offer.getPhotos().stream()
+                    .map(photo -> fileStorageService.prepareUrl(baseUrl, photo))
+                    .toList());
         }
-        String path = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
-        return baseUrl + "/static" + path;
+
+        CityEnum cityEnum = offer.getCityEnum();
+        if (cityEnum != null) {
+            OfferDtoResponse.CityDto cityDto = new OfferDtoResponse.CityDto();
+            cityDto.setName(cityEnum.getValue());
+            cityDto.setLocation(new OfferDtoResponse.LocationDto(
+                    cityEnum.getLatitude(),
+                    cityEnum.getLongitude(),
+                    cityEnum.getZoom()
+            ));
+            fullOffer.setCity(cityDto);
+        }
+
+        fullOffer.setLocation(new OfferDtoResponse.LocationDto(
+                offer.getLatitude(),
+                offer.getLongitude(),
+                13
+        ));
+
+        return fullOffer;
     }
 }

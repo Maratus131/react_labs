@@ -1,7 +1,7 @@
 package com.example.server.controller;
 
 import com.example.server.dto.UserRegistrationDtoRequest;
-import com.example.server.dto.UserRegistrationDtoResponse;
+import com.example.server.dto.UserDtoResponse;
 import com.example.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(value = "/register", consumes = "multipart/form-data")
-    public ResponseEntity<UserRegistrationDtoResponse> registerUser(
+    public ResponseEntity<UserDtoResponse> registerUser(
             @ModelAttribute UserRegistrationDtoRequest request,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar
     ) throws IOException {

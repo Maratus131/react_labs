@@ -38,4 +38,12 @@ public class FileStorageService {
 
         return folder + "/" + filename;
     }
+
+    public String prepareUrl(String baseUrl, String imagePath) {
+        if (imagePath == null || imagePath.isEmpty() || imagePath.startsWith("http")) {
+            return imagePath;
+        }
+        String path = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
+        return baseUrl + "/static" + path;
+    }
 }

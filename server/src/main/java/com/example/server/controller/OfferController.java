@@ -1,6 +1,7 @@
 package com.example.server.controller;
 
 import com.example.server.dto.CreateOfferDtoRequest;
+import com.example.server.dto.FullOfferDto;
 import com.example.server.dto.OfferDtoResponse;
 import com.example.server.model.Offer;
 import com.example.server.service.OfferService;
@@ -35,5 +36,11 @@ public class OfferController {
                 offerService.createOffer(request, previewImage, photos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<FullOfferDto> getOfferById(@PathVariable int id) {
+        FullOfferDto offer = offerService.getFullOffer(id);
+        return ResponseEntity.ok(offer);
     }
 }
