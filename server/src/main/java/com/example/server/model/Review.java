@@ -3,6 +3,7 @@ package com.example.server.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,8 @@ public class Review {
     @Size(min = 5, max = 1024)
     private String text;
 
-    @Column(nullable = false, columnDefinition = "timestamp default current_timestamp")
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime publishDate;
 
     @Column(nullable = false)
