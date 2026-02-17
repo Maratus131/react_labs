@@ -56,13 +56,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IncorrectEmailOrPassword.class)
-    public ResponseEntity<ErrorResponse> handleIncorrectEmailOrPassword(IncorrectEmailOrPassword ex, HttpServletRequest request) {
-        String message = "Invalid email or password";
+    @ExceptionHandler(
+            value = {
+                    IncorrectEmailOrPassword.class,
+                    ImageRequiredException.class,
+            })
+    public ResponseEntity<ErrorResponse> handleIncorrectRequest(RuntimeException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
-                message
+                ex.getLocalizedMessage()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

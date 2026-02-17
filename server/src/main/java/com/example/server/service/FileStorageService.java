@@ -1,5 +1,6 @@
 package com.example.server.service;
 
+import com.example.server.exceptions.ImageRequiredException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +15,7 @@ public class FileStorageService {
 
     public String saveImage(MultipartFile file, String folder) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new IOException("Failed to upload file: empty or null");
+            throw new ImageRequiredException();
         }
 
         if (!file.getContentType().startsWith("image/")) {
