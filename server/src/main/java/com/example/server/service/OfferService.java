@@ -140,6 +140,7 @@ public class OfferService {
         return response;
     }
 
+
     public FullOfferDto mapToFullOfferDto(Offer offer) {
         FullOfferDto fullOffer = new FullOfferDto();
         fullOffer.setId(offer.getId());
