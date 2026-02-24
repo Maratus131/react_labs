@@ -1,13 +1,14 @@
 package com.example.server.service;
 
-import com.example.server.dto.UserRegistrationDtoRequest;
 import com.example.server.dto.UserDtoResponse;
+import com.example.server.dto.UserRegistrationDtoRequest;
 import com.example.server.exceptions.EmailExistException;
 import com.example.server.exceptions.IncorrectEmailOrPassword;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,11 @@ public class UserService {
         userRepository.save(user);
 
         return mapToDto(user);
+    }
+
+    public User findByUsernameOrThrow(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     public UserDtoResponse mapToDto(User user) {
