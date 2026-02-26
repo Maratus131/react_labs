@@ -1,5 +1,13 @@
 import { CityOffer } from "./types/offer";
 
+const TIMEOUT_SHOW_ERROR = 2000;
+
+const APIRoute = {
+    Offers: '/offers',
+    Login: '/login',
+    Logout: '/logout',
+}
+
 const Setting = {
     rentOffersCount: 312,
 } as const;
@@ -76,4 +84,4 @@ const SortOffersType = {
 }
 
 
-export { Setting, AppRoute, AuthorizationStatus, CITIES_LOCATION, SortOffersType};
+export { TIMEOUT_SHOW_ERROR, Setting, AppRoute, AuthorizationStatus, CITIES_LOCATION, SortOffersType, APIRoute};

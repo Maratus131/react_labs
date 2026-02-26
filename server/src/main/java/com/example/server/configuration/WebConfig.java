@@ -3,8 +3,10 @@ package com.example.server.configuration;
 import com.example.server.converter.StringToCityEnumConverter;
 import com.example.server.converter.StringToFeaturesEnumConverter;
 import com.example.server.converter.StringToTypeEnumConverter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -31,5 +33,19 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/static/offers/**")
                 .addResourceLocations("file:" + uploadPath + "/offers/");
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                        .allowedHeaders("*")
+                        .allowCredentials(false);
+            }
+        };
     }
 }

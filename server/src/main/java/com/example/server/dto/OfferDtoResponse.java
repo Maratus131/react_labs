@@ -31,8 +31,8 @@ public class OfferDtoResponse {
     private LocationDto location;
 
     private int userId;
-    private String previewImageUrl;
-    List<String> photosUrl;
+    private String previewImage;
+    List<String> images;
 
     @Data
     public static class CityDto{

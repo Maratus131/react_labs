@@ -47,9 +47,9 @@ public class UserService {
         return mapToDto(user);
     }
 
-    public User findByUsernameOrThrow(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    public User findByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + email));
     }
 
     public UserDtoResponse mapToDto(User user) {

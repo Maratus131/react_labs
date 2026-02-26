@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -45,7 +46,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(adHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/logout", "/refresh").permitAll()
+                        .requestMatchers("/static/offers/**", "/static/avatars/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/offers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

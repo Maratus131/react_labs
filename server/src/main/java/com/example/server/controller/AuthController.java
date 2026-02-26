@@ -4,15 +4,17 @@ import com.example.server.dto.AuthRequest;
 import com.example.server.dto.AuthResponse;
 import com.example.server.dto.RefreshRequest;
 import com.example.server.model.User;
+import com.example.server.security.CustomUserDetails;
 import com.example.server.service.JwtService;
 import com.example.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,15 +27,15 @@ public class AuthController {
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.getUsername(),
+                        authRequest.getEmail(),
                         authRequest.getPassword()
                 )
         );
 
-        User user = userService.findByUsernameOrThrow(authRequest.getUsername());
+        User user = userService.findByEmailOrThrow(authRequest.getEmail());
 
-        String accessToken = jwtService.generateAccessToken(user.getId(), user.getUsername());
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
 
         return new AuthResponse(accessToken, refreshToken);
     }
@@ -46,10 +48,30 @@ public class AuthController {
             throw new IllegalArgumentException("Invalid refresh token");
         }
 
-        String username = jwtService.extractUsername(refreshToken);
+        String email = jwtService.extractEmail(refreshToken);
         Integer userId = jwtService.extractUserId(refreshToken);
 
-        String newAccessToken = jwtService.generateAccessToken(userId, username);
+        String newAccessToken = jwtService.generateAccessToken(userId, email);
         return new AuthResponse(newAccessToken, refreshToken);
+    }
+
+    @GetMapping("/login")
+    public AuthResponse checkAuth(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails == null) {
+            throw new UsernameNotFoundException("User is not authenticated");
+        }
+
+        User user = userDetails.getUser();
+
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
+
+        return new AuthResponse(accessToken, refreshToken);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.noContent().build();
     }
 }

@@ -29,6 +29,6 @@ public class FullOfferDto {
     private OfferDtoResponse.LocationDto location;
 
     private UserDtoResponse author;
-    private String previewImageUrl;
-    List<String> photosUrl;
+    private String previewImage;
+    List<String> images;
 }

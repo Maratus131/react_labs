@@ -7,7 +7,6 @@ type FavoritesPageProps = {
     offersList: OffersList[];
 };
 
-// группировка избранных по городам
 function groupByCity(favorites: OffersList[]) {
     const result: Record<string, OffersList[]> = {};
 

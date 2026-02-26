@@ -104,7 +104,7 @@ public class OfferService {
         response.setPrice(offer.getPrice());
         response.setRooms(offer.getRooms());
         response.setGuests(offer.getGuests());
-        response.setPreviewImageUrl(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
+        response.setPreviewImage(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
         response.setFeatures(offer.getFeatures());
         response.setCommentsCount(offer.getCommentsCount());
 
@@ -114,7 +114,7 @@ public class OfferService {
         response.setType(offer.getType());
         response.setRating(offer.getRating());
         if (offer.getPhotos() != null) {
-            response.setPhotosUrl(offer.getPhotos().stream()
+            response.setImages(offer.getPhotos().stream()
                     .map(photo -> fileStorageService.prepareUrl(baseUrl, photo))
                     .toList());
         }
@@ -150,7 +150,7 @@ public class OfferService {
         fullOffer.setPrice(offer.getPrice());
         fullOffer.setRooms(offer.getRooms());
         fullOffer.setGuests(offer.getGuests());
-        fullOffer.setPreviewImageUrl(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
+        fullOffer.setPreviewImage(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
         fullOffer.setFeatures(offer.getFeatures());
         fullOffer.setCommentsCount(offer.getCommentsCount());
 
@@ -161,7 +161,7 @@ public class OfferService {
         fullOffer.setType(offer.getType());
 
         if (offer.getPhotos() != null) {
-            fullOffer.setPhotosUrl(offer.getPhotos().stream()
+            fullOffer.setImages(offer.getPhotos().stream()
                     .map(photo -> fileStorageService.prepareUrl(baseUrl, photo))
                     .toList());
         }
