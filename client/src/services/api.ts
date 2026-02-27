@@ -1,12 +1,15 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { getToken } from './token';
+import { dropToken, getToken } from './token';
 import { StatusCodes } from 'http-status-codes';
 import { processErrorHandle } from './process-error-handle';
+import { requireAuthorization } from '../store/action';
+import { store } from '../store';
+import { AuthorizationStatus } from '../const';
 
 type DetailMessageType = {
     type: string;
     message: string;
-} 
+}
 
 const StatusCodeMapping: Record<number, boolean> = {
     [StatusCodes.BAD_REQUEST]: true,
@@ -14,7 +17,7 @@ const StatusCodeMapping: Record<number, boolean> = {
     [StatusCodes.NOT_FOUND]: true,
 }
 
-const shouldDisplayError = (response: AxiosResponse) => !StatusCodeMapping[response.status]; 
+const shouldDisplayError = (response: AxiosResponse) => !StatusCodeMapping[response.status];
 
 const BACKEND_URL = 'http://localhost:5000';
 const REQUEST_TIMEOUT = 5000;
@@ -28,6 +31,11 @@ export const createAPI = (): AxiosInstance => {
     api.interceptors.response.use(
         (response) => response,
         (error: AxiosError<DetailMessageType>) => {
+            if (error.response?.status === StatusCodes.UNAUTHORIZED) {
+                dropToken(); // Удаляем токен из localStorage
+                store.dispatch(requireAuthorization(AuthorizationStatus.NoAuth)); // Сбрасываем стейт
+            }
+
             if (error.response && shouldDisplayError(error.response)) {
                 const detailMessage = (error.response.data);
                 processErrorHandle(detailMessage.message);
@@ -42,7 +50,7 @@ export const createAPI = (): AxiosInstance => {
 
             if (token) {
                 config.headers = config.headers ?? {};
-                config.headers['x-token'] = token;
+                config.headers['Authorization'] = `Bearer ${token}`;
 
             }
             return config;

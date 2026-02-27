@@ -2,7 +2,9 @@ package com.example.server.controller;
 
 import com.example.server.dto.AuthRequest;
 import com.example.server.dto.AuthResponse;
+import com.example.server.dto.AuthUserResponse;
 import com.example.server.dto.RefreshRequest;
+import com.example.server.enums.UserType;
 import com.example.server.model.User;
 import com.example.server.security.CustomUserDetails;
 import com.example.server.service.JwtService;
@@ -56,7 +58,7 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public AuthResponse checkAuth(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public AuthUserResponse checkAuth(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (userDetails == null) {
             throw new UsernameNotFoundException("User is not authenticated");
@@ -65,9 +67,15 @@ public class AuthController {
         User user = userDetails.getUser();
 
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail());
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
 
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthUserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getAvatar(),
+                user.getUserType() == UserType.PRO,
+                accessToken
+        );
     }
 
     @DeleteMapping("/logout")

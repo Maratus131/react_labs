@@ -60,12 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return "/login".equals(path);
-    }
-
     private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
         var errorResponse = new ErrorResponse(
                 status.value(),

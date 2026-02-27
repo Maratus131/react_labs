@@ -3,7 +3,7 @@ export type UserData = {
     avatarUrl: string;
     isPro: boolean;
     email: string;
-    token: string;
+    accessToken: string;
 };
 
 export type AuthData = {
