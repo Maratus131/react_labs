@@ -10,6 +10,7 @@ import { fetchFullOfferAction, fetchReviewsAction } from "../../store/api-action
 import { OffersList } from "../../types/offer";
 import AppHeader from "../../components/app-header/app-header";
 import { AuthorizationStatus } from "../../const";
+import LoadingPage from "../../components/loading-page/loading-page";
 
 
 function OfferPage() {
@@ -18,6 +19,7 @@ function OfferPage() {
 
     const offers = useAppSelector((state) => state.offers);
     const offer = useAppSelector((state) => state.fullOffer);
+    const isFullOfferDataLoading = useAppSelector((state) => state.isFullOfferDataLoading);
     const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
 
     useEffect(() => {
@@ -26,6 +28,10 @@ function OfferPage() {
             dispatch(fetchReviewsAction(id));
         }
     }, [id, dispatch]);
+
+    if (isFullOfferDataLoading) {
+        return <LoadingPage />;
+    }
 
     if (!offer) {
         return <NotFoundPage />;
@@ -146,7 +152,7 @@ function OfferPage() {
                             </div>
 
                             <section className="offer__reviews reviews">
-                                <ReviewsList/>
+                                <ReviewsList />
                                 {authorizationStatus === AuthorizationStatus.Auth ?
                                     <ReviewsForm /> : <></>}
                             </section>

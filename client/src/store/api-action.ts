@@ -70,9 +70,12 @@ const fetchOffersAction = createAsyncThunk<void, undefined, {
     'data/fetchOffers',
     async (_arg, { dispatch, extra: api }) => {
         dispatch(setOffersDataLoadingStatus(true));
-        const { data } = await api.get<OffersList[]>(APIRoute.Offers);
-        dispatch(offersCityList(data));
-        dispatch(setOffersDataLoadingStatus(false));
+        try {
+            const { data } = await api.get<OffersList[]>(APIRoute.Offers);
+            dispatch(offersCityList(data));
+        } finally {
+            dispatch(setOffersDataLoadingStatus(false));
+        }
     },
 );
 
@@ -220,19 +223,24 @@ const sendReviewAction = createAsyncThunk<
                 }
             );
 
+            const userData = getState().userData;
+
             const mappedReview: Review = {
-                id: data.id,
+                id: String(data.reviewId),
                 comment: data.comment,
                 rating: data.rating,
-                date: data.date,
+                date: new Date().toISOString(),
                 user: {
-                    name: data.user.username,
-                    avatarUrl: data.user.avatarUrl,
-                    isPro: data.user.pro
+                    name: userData?.name ?? '',
+                    avatarUrl: userData?.avatar ?? '',
+                    isPro: userData?.isPro ?? false
                 }
             };
 
             dispatch(addReview(mappedReview));
+
+            await dispatch(fetchReviewsAction(offerId));
+
             dispatch(setReviewSendingStatus(false));
 
             return mappedReview;
