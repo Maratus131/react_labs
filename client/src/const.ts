@@ -6,6 +6,7 @@ const APIRoute = {
     Offers: '/offers',
     Login: '/login',
     Logout: '/logout',
+    Comments: '/comments'
 }
 
 const Setting = {
@@ -16,7 +17,7 @@ const AppRoute = {
     Main: '/',
     Login: '/login',
     Favorites: '/favorites',
-    Offer: '/offer',
+    Offer: '/offers',
 } as const;
 
 const AuthorizationStatus = {

@@ -48,8 +48,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(adHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/static/offers/**", "/static/avatars/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/offers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/login", "/offers/**", "/comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/logout").permitAll()
                         .anyRequest().authenticated()

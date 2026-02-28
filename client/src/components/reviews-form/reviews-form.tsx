@@ -1,39 +1,48 @@
-import React, { useState } from "react";
-import { Review } from "../../types/reviews";
+import React, { useState, FormEvent } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { sendReviewAction } from "../../store/api-action";
 
+function ReviewsForm() {
+    const dispatch = useAppDispatch();
 
-type ReviewsFormProps = {
-    onAddReview: (review: Review) => void;
-}
+    const offer = useAppSelector((state) => state.fullOffer);
 
-function ReviewsForm({ onAddReview }: ReviewsFormProps) {
+    const user = useAppSelector((state) => state.userData);
+
+    const isSending = useAppSelector((state) => state.isReviewSending);
 
     const [review, setReview] = useState("");
     const [rating, setRating] = useState(0);
 
-    const handleSubmitReview = (evt: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
         evt.preventDefault();
-        if (rating === 0 || review.length > 50) return;
 
-        const newReview: Review = {
-            id: crypto.randomUUID(),
-            rating,
-            comment: review,
-            date: new Date().toISOString(),
-            user: {
-                name: 'You',
-                avatarUrl: "/img/avatar.svg",
-                isPro: false
-            }
-        };
-        onAddReview(newReview);
+        if (!offer || !user) return;
 
-        setReview("");
-        setRating(0);
+        if (rating !== 0 && review.length >= 50) {
+            dispatch(
+                sendReviewAction({
+                    offerId: offer.id,
+                    comment: review,
+                    rating,
+                    userId: user.id
+                })
+            );
+
+            setReview("");
+            setRating(0);
+        }
     };
 
+    const isDisabled = rating === 0 || review.length < 50 || isSending;
+
     return (
-        <form className="reviews__form form" action="#" method="post" onSubmit={handleSubmitReview}>
+        <form
+            className="reviews__form form"
+            action="#"
+            method="post"
+            onSubmit={handleSubmit}
+        >
             <svg width="0" height="0">
                 <symbol id="icon-star" viewBox="0 0 13 12">
                     <path
@@ -43,6 +52,7 @@ function ReviewsForm({ onAddReview }: ReviewsFormProps) {
                     />
                 </symbol>
             </svg>
+
             <label className="reviews__label form__label" htmlFor="review">
                 Your review
             </label>
@@ -58,11 +68,11 @@ function ReviewsForm({ onAddReview }: ReviewsFormProps) {
                             type="radio"
                             checked={rating === num}
                             onChange={() => setRating(num)}
+                            disabled={isSending}
                         />
                         <label
                             htmlFor={`${num}-stars`}
                             className="reviews__rating-label form__rating-label"
-                            title="rating"
                         >
                             <svg className="form__star-image" width="37" height="33">
                                 <use href="#icon-star"></use>
@@ -79,7 +89,8 @@ function ReviewsForm({ onAddReview }: ReviewsFormProps) {
                 placeholder="Tell how was your stay..."
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
-            ></textarea>
+                disabled={isSending}
+            />
 
             <div className="reviews__button-wrapper">
                 <p className="reviews__help">
@@ -88,12 +99,13 @@ function ReviewsForm({ onAddReview }: ReviewsFormProps) {
                     your stay with at least{" "}
                     <b className="reviews__text-amount">50 characters</b>.
                 </p>
+
                 <button
                     className="reviews__submit form__submit button"
                     type="submit"
-                    disabled={rating === 0 || review.length > 50}
+                    disabled={isDisabled}
                 >
-                    Submit
+                    {isSending ? "Sending..." : "Submit"}
                 </button>
             </div>
         </form>

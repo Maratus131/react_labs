@@ -86,7 +86,6 @@ public class AuthController {
 
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout() {
-        System.out.println("LOGOUT CONTROLLER HIT");
         return ResponseEntity.noContent().build();
     }
 }

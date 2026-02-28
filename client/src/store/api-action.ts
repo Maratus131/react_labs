@@ -1,13 +1,66 @@
 import { AxiosInstance } from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, State } from "../types/state";
-import { OffersList } from "../types/offer";
-import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData } from "./action";
+import { FullOffer, OffersList } from "../types/offer";
+import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData, fullOffer, setFullOfferDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, addReview } from "./action";
 import { AuthorizationStatus, TIMEOUT_SHOW_ERROR } from "../const";
 import { dropToken, saveToken } from "../services/token";
 import { APIRoute } from "../const";
 import { AuthData, UserData } from "../types/user-data";
 import { store } from ".";
+import { Review } from "../types/reviews";
+
+const fetchFullOfferAction = createAsyncThunk<
+    FullOffer,
+    string,
+    {
+        dispatch: AppDispatch;
+        state: State;
+        extra: AxiosInstance;
+        rejectValue: string;
+    }
+>(
+    'data/fetchFullOffer',
+    async (offerId, { dispatch, extra: api, rejectWithValue }) => {
+        try {
+            dispatch(setFullOfferDataLoadingStatus(true));
+
+            const { data } = await api.get(`${APIRoute.Offers}/${offerId}`);
+
+            const mappedOffer: FullOffer = {
+                id: String(data.id),
+                title: data.title,
+                type: data.type,
+                price: data.price,
+                city: data.city,
+                location: data.location,
+                isFavorite: data.favorite,
+                isPremium: data.premium,
+                rating: data.rating,
+                description: data.description,
+                bedrooms: data.rooms,
+                goods: data.features,
+                host: {
+                    name: data.author.username,
+                    avatarUrl: data.author.avatarUrl,
+                    isPro: data.author.pro,
+                },
+                images: data.images,
+                maxAdults: data.guests,
+            };
+
+            dispatch(fullOffer(mappedOffer));
+            dispatch(setFullOfferDataLoadingStatus(false));
+
+            return mappedOffer;
+        } catch {
+            dispatch(setFullOfferDataLoadingStatus(false));
+            dispatch(setError('Failed to load offer'));
+
+            return rejectWithValue('Failed to load offer');
+        }
+    }
+);
 
 const fetchOffersAction = createAsyncThunk<void, undefined, {
     dispatch: AppDispatch;
@@ -99,4 +152,104 @@ const clearErrorAction = createAsyncThunk(
     },
 );
 
-export { fetchOffersAction, checkAuthAction, loginAction, logoutAction, clearErrorAction };
+const fetchReviewsAction = createAsyncThunk<
+    void,
+    string,
+    {
+        dispatch: AppDispatch;
+        state: State;
+        extra: AxiosInstance;
+    }
+>(
+    'data/fetchReviews',
+    async (offerId, { dispatch, extra: api, rejectWithValue }) => {
+        try {
+            dispatch(setReviewsDataLoadingStatus(true));
+
+            const { data } = await api.get<any[]>(`${APIRoute.Comments}/${offerId}`);
+
+            const mappedReviews: Review[] = data.map((item) => ({
+                id: item.reviewId,
+                comment: item.comment,
+                rating: item.rating,
+                date: item.date,
+                user: {
+                    name: item.user.username,
+                    avatarUrl: item.user.avatarUrl,
+                    isPro: item.user.pro
+                }
+            }));
+
+            dispatch(setReviews(mappedReviews));
+            dispatch(setReviewsDataLoadingStatus(false));
+        } catch (error) {
+            dispatch(setReviewsDataLoadingStatus(false));
+            return rejectWithValue('Failed to load reviews');
+        }
+    }
+);
+
+const sendReviewAction = createAsyncThunk<
+    Review,
+    { offerId: string; comment: string; rating: number, userId: string },
+    {
+        dispatch: AppDispatch;
+        state: State;
+        extra: AxiosInstance;
+        rejectValue: string;
+    }
+>(
+    'data/sendReview',
+    async ({ offerId, comment, rating }, { dispatch, getState, extra: api, rejectWithValue }) => {
+        const { authorizationStatus } = getState();
+
+        if (authorizationStatus !== AuthorizationStatus.Auth) {
+            return rejectWithValue('User is not authorized');
+        }
+
+        try {
+            dispatch(setReviewSendingStatus(true));
+
+            const { data } = await api.post(
+                `${APIRoute.Comments}`,
+                {
+                    comment,
+                    rating,
+                    offerId,
+                    userId: getState().userData?.id
+                }
+            );
+
+            const mappedReview: Review = {
+                id: data.id,
+                comment: data.comment,
+                rating: data.rating,
+                date: data.date,
+                user: {
+                    name: data.user.username,
+                    avatarUrl: data.user.avatarUrl,
+                    isPro: data.user.pro
+                }
+            };
+
+            dispatch(addReview(mappedReview));
+            dispatch(setReviewSendingStatus(false));
+
+            return mappedReview;
+        } catch {
+            dispatch(setReviewSendingStatus(false));
+            return rejectWithValue('Failed to post review');
+        }
+    }
+);
+
+export {
+    fetchOffersAction,
+    checkAuthAction,
+    loginAction,
+    logoutAction,
+    clearErrorAction,
+    fetchFullOfferAction,
+    fetchReviewsAction,
+    sendReviewAction
+};

@@ -9,6 +9,7 @@ import { AppRoute, AuthorizationStatus } from "../../const";
 import { PrivateRoute } from "../private-route/private-route";
 import { useAppSelector } from "../../hooks";
 import LoadingPage from "../loading-page/loading-page";
+import { OfferPage } from "../../pages/offer-page/offer-page";
 
 function App(): JSX.Element {
 
@@ -32,10 +33,10 @@ function App(): JSX.Element {
                     path={AppRoute.Login}
                     element={<LoginPage />}
                 />
-                {/* <Route
+                <Route
                     path={`${AppRoute.Offer}/:id`}
                     element={<OfferPage />}
-                /> */}
+                />
                 {/* <Route
                     path={AppRoute.Favorites}
                     element={

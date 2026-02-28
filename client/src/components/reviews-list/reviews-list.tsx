@@ -1,11 +1,10 @@
+import { useAppSelector } from "../../hooks";
 import { Review } from "../../types/reviews";
 import ReviewItem from "../review-item/review-item";
 
-type ReviewsListProps = {
-    reviews: Review[];
-}
 
-function ReviewsList({ reviews }: ReviewsListProps) {
+function ReviewsList() {
+    const reviews = useAppSelector((state) => state.reviews);
     return (
         <>
             <h2 className="reviews__title">
