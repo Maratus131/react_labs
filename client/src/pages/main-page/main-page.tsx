@@ -2,19 +2,27 @@ import { useState } from "react";
 import { Logo } from "../../components/logo/logo";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
 import Map from "../../components/map/map";
-import { useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { getFavoritesLength, getOffersByCity, sortOffersByType } from "../../utils";
 import { CitiesList } from "../../components/cities-list/cities-list";
 import { SortOffer } from "../../types/sort";
 import { SortOptions } from "../../components/sort-options/sort-options";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getAuthorizationStatus } from "../../store/selectors";
+import { AppRoute, AuthorizationStatus } from "../../const";
+import { logoutAction } from "../../store/api-action";
 
 function MainPage() {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
+
     const [selectedOfferId, setSelectedOfferId] = useState<string | undefined>(undefined);
     const [activeSort, setActiveSort] = useState<SortOffer>('Popular');
 
     const selectedCity = useAppSelector((state) => state.city);
     const offersList = useAppSelector((state) => state.offers);
+    const userData = useAppSelector((state) => state.userData);
 
     const selectedCityOffers = (selectedCity
         ? getOffersByCity(selectedCity.name, offersList)
@@ -49,6 +57,14 @@ function MainPage() {
         lng: o.location.longitude,
     }));
 
+    const userAuthorizationStatus = useAppSelector(getAuthorizationStatus);
+
+    const onClickLogout = async (e) => {
+        e.preventDefault();
+        await dispatch(logoutAction());
+        navigate(AppRoute.Login);
+    };
+
     const handleListItemHover = (offerId: string | undefined) => {
         setSelectedOfferId(offerId);
     };
@@ -64,22 +80,39 @@ function MainPage() {
                         </div>
                         <nav className="header__nav">
                             <ul className="header__nav-list">
-                                <li className="header__nav-item user">
-                                    <a className="header__nav-link header__nav-link--profile" href="#">
-                                        <div className="header__avatar-wrapper user__avatar-wrapper">
-                                        </div>
-                                        <span className="header__user-name user__name">Myemail@gmail.com</span>
-                                        <Link to="/favorites">
-                                            <span className="header__favorite-count">{favoriteLength}</span>
-                                        </Link>
+                                {
+                                    userAuthorizationStatus === AuthorizationStatus.Auth ? (
+                                        <>
+                                            <li className="header__nav-item user">
+                                                <a className="header__nav-link header__nav-link--profile" href="#">
+                                                    <div className="header__avatar-wrapper user__avatar-wrapper">
+                                                        <img src={userData?.avatar}/>
+                                                    </div>
+                                                    <span className="header__user-name user__name">
+                                                        {userData?.email}
+                                                    </span>
+                                                    <Link to="/favorites">
+                                                        <span className="header__favorite-count">{favoriteLength}</span>
+                                                    </Link>
+                                                </a>
+                                            </li>
+                                            <a
+                                                className="header__nav-link"
+                                                href="/"
+                                                onClick={onClickLogout}
+                                            >
+                                                <span className="header__signout">Sign out</span>
+                                            </a>
+                                        </>
+                                    ) : (
+                                        <li className="header__nav-item">
+                                            <Link className="header__nav-link" to="/login">
+                                                <span className="header__login">Sign in</span>
+                                            </Link>
+                                        </li>
+                                    )
+                                }
 
-                                    </a>
-                                </li>
-                                <li className="header__nav-item">
-                                    <a className="header__nav-link" href="#">
-                                        <span className="header__signout">Sign out</span>
-                                    </a>
-                                </li>
                             </ul>
                         </nav>
                     </div>

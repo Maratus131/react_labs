@@ -531,10 +531,8 @@ img {
     border-radius: 15px
 }
 
-.user__avatar-wrapper {
-    background-image: url(../img/avatar.svg);
-    background-size: 100%;
-    background-repeat: no-repeat
+.user__avatar-wrapper img {
+    border-radius: 50%;
 }
 
 .user__avatar {

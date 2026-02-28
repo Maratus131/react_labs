@@ -7,9 +7,11 @@ import com.example.server.dto.RefreshRequest;
 import com.example.server.enums.UserType;
 import com.example.server.model.User;
 import com.example.server.security.CustomUserDetails;
+import com.example.server.service.FileStorageService;
 import com.example.server.service.JwtService;
 import com.example.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,10 @@ public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final FileStorageService fileStorageService;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @PostMapping("/login")
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
@@ -72,7 +78,7 @@ public class AuthController {
                 user.getId(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getAvatar(),
+                fileStorageService.prepareUrl(baseUrl, user.getAvatar()),
                 user.getUserType() == UserType.PRO,
                 accessToken
         );
@@ -80,6 +86,7 @@ public class AuthController {
 
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout() {
+        System.out.println("LOGOUT CONTROLLER HIT");
         return ResponseEntity.noContent().build();
     }
 }
