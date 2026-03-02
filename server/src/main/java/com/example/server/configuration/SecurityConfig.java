@@ -47,6 +47,13 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(adHandler))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/static/offers/**", "/static/avatars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/login", "/offers/**", "/comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()

@@ -10,6 +10,9 @@ import com.example.server.security.CustomUserDetails;
 import com.example.server.service.FileStorageService;
 import com.example.server.service.JwtService;
 import com.example.server.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Authentication")
 public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
@@ -32,6 +36,7 @@ public class AuthController {
     private String baseUrl;
 
     @PostMapping("/login")
+    @Operation(summary = "Аутентификация и получение токена")
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -49,6 +54,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Рефреш acсess токена")
     public AuthResponse refresh(@RequestBody RefreshRequest refreshRequest) {
         String refreshToken = refreshRequest.getRefreshToken();
 
@@ -64,6 +70,7 @@ public class AuthController {
     }
 
     @GetMapping("/login")
+    @Operation(summary = "Проверка аутентификации", description = "Проверка на то, что пользователь в данный момент аутентифицирован")
     public AuthUserResponse checkAuth(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (userDetails == null) {
@@ -85,6 +92,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
+    @Operation(summary = "Выход из аккаунта")
     public ResponseEntity<Void> logout() {
         return ResponseEntity.noContent().build();
     }
