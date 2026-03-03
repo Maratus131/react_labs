@@ -4,6 +4,7 @@ import com.example.server.dto.CreateOfferDtoRequest;
 import com.example.server.dto.FullOfferDto;
 import com.example.server.dto.OfferDtoResponse;
 import com.example.server.enums.CityEnum;
+import com.example.server.enums.FeaturesEnum;
 import com.example.server.exceptions.OfferNotFoundException;
 import com.example.server.exceptions.UserNotFoundException;
 import com.example.server.model.Offer;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,13 +107,14 @@ public class OfferService {
         response.setRooms(offer.getRooms());
         response.setGuests(offer.getGuests());
         response.setPreviewImage(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
-        response.setFeatures(offer.getFeatures());
+        response.setFeatures(offer.getFeatures()
+                .stream().map(FeaturesEnum::getValue).collect(Collectors.toSet()));
         response.setCommentsCount(offer.getCommentsCount());
 
         response.setPremium(offer.isPremium());
         response.setFavorite(offer.isFavorite());
         response.setUserId(offer.getAuthor().getId());
-        response.setType(offer.getType());
+        response.setType(offer.getType().getValue());
         response.setRating(offer.getRating());
         if (offer.getPhotos() != null) {
             response.setImages(offer.getPhotos().stream()
@@ -151,14 +154,15 @@ public class OfferService {
         fullOffer.setRooms(offer.getRooms());
         fullOffer.setGuests(offer.getGuests());
         fullOffer.setPreviewImage(fileStorageService.prepareUrl(baseUrl, offer.getPreviewImage()));
-        fullOffer.setFeatures(offer.getFeatures());
+        fullOffer.setFeatures(offer.getFeatures()
+                .stream().map(FeaturesEnum::getValue).collect(Collectors.toSet()));
         fullOffer.setCommentsCount(offer.getCommentsCount());
 
         fullOffer.setRating(offer.getRating());
         fullOffer.setFavorite(offer.isFavorite());
         fullOffer.setPremium(offer.isPremium());
         fullOffer.setAuthor(userService.mapToDto(offer.getAuthor()));
-        fullOffer.setType(offer.getType());
+        fullOffer.setType(offer.getType().getValue());
 
         if (offer.getPhotos() != null) {
             fullOffer.setImages(offer.getPhotos().stream()

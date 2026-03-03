@@ -21,11 +21,11 @@ public class OfferDtoResponse {
     private boolean isPremium;
     private boolean isFavorite;
     private double rating;
-    private TypeEnum type;
+    private String type;
     private int rooms;
     private int guests;
     private double price;
-    private Set<FeaturesEnum> features;
+    private Set<String> features;
     private int commentsCount;
 
     private LocationDto location;

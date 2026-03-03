@@ -56,7 +56,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/static/offers/**", "/static/avatars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/login", "/offers/**", "/comments/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login", "/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login", "/refresh", "/register").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/logout").permitAll()
                         .anyRequest().authenticated()
                 )

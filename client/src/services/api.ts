@@ -32,8 +32,8 @@ export const createAPI = (): AxiosInstance => {
         (response) => response,
         (error: AxiosError<DetailMessageType>) => {
             if (error.response?.status === StatusCodes.UNAUTHORIZED) {
-                dropToken(); // Удаляем токен из localStorage
-                store.dispatch(requireAuthorization(AuthorizationStatus.NoAuth)); // Сбрасываем стейт
+                dropToken(); 
+                store.dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
             }
 
             if (error.response && shouldDisplayError(error.response)) {
