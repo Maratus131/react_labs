@@ -28,21 +28,26 @@ export const createAPI = (): AxiosInstance => {
         timeout: REQUEST_TIMEOUT,
     });
 
-    api.interceptors.response.use(
-        (response) => response,
-        (error: AxiosError<DetailMessageType>) => {
-            if (error.response?.status === StatusCodes.UNAUTHORIZED) {
-                dropToken(); 
-                store.dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
+    api.interceptors.request.use(
+        (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+            const token = getToken();
+
+            const isPublicGet =
+                config.method === 'get' &&
+                (
+                    config.url?.startsWith('/offers') ||
+                    config.url?.startsWith('/comments')
+                );
+
+            if (token && !isPublicGet) {
+                config.headers = config.headers ?? {};
+                config.headers['Authorization'] = `Bearer ${token}`;
             }
 
-            if (error.response && shouldDisplayError(error.response)) {
-                const detailMessage = (error.response.data);
-                processErrorHandle(detailMessage.message);
-            }
-            throw error;
-        }
-    )
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
 
     api.interceptors.request.use(
         (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {

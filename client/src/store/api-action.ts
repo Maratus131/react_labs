@@ -117,16 +117,16 @@ const loginAction = createAsyncThunk<
     async ({ email, password }, { dispatch, extra: api, rejectWithValue }) => {
         try {
             const { data } = await api.post<UserData>(APIRoute.Login, { email, password });
-            console.log('LOGIN RESPONSE:', data);
             saveToken(data.accessToken);
             await dispatch(checkAuthAction());
-
 
             dispatch(fetchOffersAction());
             return data;
         } catch (err) {
             dropToken();
             dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
+            dispatch(setError('Login failed'));
+            dispatch(clearErrorAction());
             return rejectWithValue("Login failed");
         }
     }
