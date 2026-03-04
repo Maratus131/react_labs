@@ -37,7 +37,7 @@ function App(): JSX.Element {
                     path={`${AppRoute.Offer}/:id`}
                     element={<OfferPage />}
                 />
-                {/* <Route
+                <Route
                     path={AppRoute.Favorites}
                     element={
                         <PrivateRoute
@@ -46,7 +46,7 @@ function App(): JSX.Element {
                             <FavoritesPage />
                         </PrivateRoute>
                     }
-                /> */}
+                />
                 <Route
                     path="*"
                     element={<NotFoundPage />}

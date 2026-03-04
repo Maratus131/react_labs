@@ -49,22 +49,20 @@ export const createAPI = (): AxiosInstance => {
         (error) => Promise.reject(error)
     );
 
-    api.interceptors.request.use(
-        (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-            const token = getToken();
-
-            if (token) {
-                config.headers = config.headers ?? {};
-                config.headers['Authorization'] = `Bearer ${token}`;
-
+    api.interceptors.response.use(
+        (response) => response,
+        (error: AxiosError<DetailMessageType>) => {
+            if (error.response?.status === StatusCodes.UNAUTHORIZED) {
+                dropToken();
+                store.dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
             }
-            return config;
 
-        },
-        (error) => {
-            return Promise.reject(error);
+            if (error.response && shouldDisplayError(error.response)) {
+                const detailMessage = (error.response.data);
+                processErrorHandle(detailMessage.message);
+            }
+            throw error;
         }
-    );
-
+    )
     return api;
 };

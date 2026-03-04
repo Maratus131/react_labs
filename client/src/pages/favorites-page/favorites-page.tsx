@@ -1,71 +1,79 @@
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { FavoritesCardList } from "../../components/favorites-card-list/favorites-card-list";
 import { Logo } from "../../components/logo/logo";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { fetchFavoriteOffersAction } from "../../store/api-action";
 import { OffersList } from "../../types/offer";
-import { getFavoritesOffers } from "../../utils";
+import AppHeader from "../../components/app-header/app-header";
 
-type FavoritesPageProps = {
-    offersList: OffersList[];
-};
+const groupByCity = (offers: OffersList[]) => {
+    return offers.reduce<Record<string, OffersList[]>>((acc, offer) => {
+        const cityName = offer.city.name;
 
-function groupByCity(favorites: OffersList[]) {
-    const result: Record<string, OffersList[]> = {};
-
-    favorites.forEach((offer) => {
-        const city = offer.city.name;
-
-        if (!result[city]) {
-            result[city] = [];
+        if (!acc[cityName]) {
+            acc[cityName] = [];
         }
 
-        result[city].push(offer);
-    });
+        acc[cityName].push(offer);
 
-    return result;
-}
+        return acc;
+    }, {});
+};
 
-function FavoritesPage({ offersList }: FavoritesPageProps) {
-    const favoritesOffers = getFavoritesOffers(offersList) ?? [];
+function FavoritesPage() {
+    const dispatch = useAppDispatch();
+    const favoritesOffers = useAppSelector((state) => state.favoriteOffers);
     const groupedFavorites = groupByCity(favoritesOffers);
+
+    const isEmpty = favoritesOffers.length === 0;
+
+    useEffect(() => {
+        dispatch(fetchFavoriteOffersAction());
+    }, [dispatch]);
 
     return (
         <div className="page">
-            <header className="header">
-                <div className="container">
-                    <div className="header__wrapper">
-                        <div className="header__left">
-                            <Logo />
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <AppHeader />
 
             <main className="page__main page__main--favorites">
                 <div className="page__favorites-container container">
                     <section className="favorites">
                         <h1 className="favorites__title">Saved listing</h1>
 
-                        <ul className="favorites__list">
-                            {Object.entries(groupedFavorites).map(([cityName, offers]) => (
-                                <li key={cityName} className="favorites__locations-items">
-                                    <div className="favorites__locations locations locations--current">
-                                        <div className="locations__item">
-                                            <a className="locations__item-link" href="#">
-                                                <span>{cityName}</span>
-                                            </a>
-                                        </div>
-                                    </div>
+                        {isEmpty ? (
+                            <p>No saved offers yet</p>
+                        ) : (
+                            <ul className="favorites__list">
+                                {Object.entries(groupedFavorites).map(
+                                    ([cityName, offers]) => (
+                                        <li
+                                            key={cityName}
+                                            className="favorites__locations-items"
+                                        >
+                                            <div className="favorites__locations locations locations--current">
+                                                <div className="locations__item">
+                                                    <Link
+                                                        className="locations__item-link"
+                                                        to="/"
+                                                    >
+                                                        <span>{cityName}</span>
+                                                    </Link>
+                                                </div>
+                                            </div>
 
-                                    {/* карточки только этого города */}
-                                    <FavoritesCardList offersList={offers} />
-                                </li>
-                            ))}
-                        </ul>
+                                            <FavoritesCardList offersList={offers} />
+                                        </li>
+                                    )
+                                )}
+                            </ul>
+                        )}
                     </section>
                 </div>
             </main>
 
             <footer className="footer container">
-                <a className="footer__logo-link" href="main.html">
+                <Link className="footer__logo-link" to="/">
                     <img
                         className="footer__logo"
                         src="img/logo.svg"
@@ -73,7 +81,7 @@ function FavoritesPage({ offersList }: FavoritesPageProps) {
                         width="64"
                         height="33"
                     />
-                </a>
+                </Link>
             </footer>
         </div>
     );

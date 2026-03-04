@@ -19,6 +19,8 @@ function MainPage() {
         ? getOffersByCity(selectedCity.name, offersList)
         : []) || [];
 
+    console.log(selectedCityOffers);
+
     const rentalOffersCount = selectedCityOffers?.length;
 
     const defaultCityLocation = { lat: 52.3702, lng: 4.8952, zoom: 19 };

@@ -1,8 +1,8 @@
 import { AxiosInstance } from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, State } from "../types/state";
-import { FullOffer, OffersList } from "../types/offer";
-import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData, fullOffer, setFullOfferDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, addReview } from "./action";
+import { FullOffer } from "../types/offer";
+import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData, fullOffer, setFullOfferDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, addReview, favoriteOffer, setFavoriteOfferDataLoadingStatus } from "./action";
 import { AuthorizationStatus, TIMEOUT_SHOW_ERROR } from "../const";
 import { dropToken, saveToken } from "../services/token";
 import { APIRoute } from "../const";
@@ -71,10 +71,55 @@ const fetchOffersAction = createAsyncThunk<void, undefined, {
     async (_arg, { dispatch, extra: api }) => {
         dispatch(setOffersDataLoadingStatus(true));
         try {
-            const { data } = await api.get<OffersList[]>(APIRoute.Offers);
-            dispatch(offersCityList(data));
+            const { data } = await api.get(APIRoute.Offers);
+
+            const mappedOffers = data.map((offer: any) => ({
+                id: String(offer.id),
+                title: offer.title,
+                type: offer.type,
+                price: offer.price,
+                city: offer.city,
+                location: offer.location,
+                isFavorite: offer.favorite,
+                isPremium: offer.premium,
+                rating: offer.rating,
+                previewImage: offer.previewImage,
+            }));
+
+            dispatch(offersCityList(mappedOffers));
         } finally {
             dispatch(setOffersDataLoadingStatus(false));
+        }
+    },
+);
+
+const fetchFavoriteOffersAction = createAsyncThunk<void, undefined, {
+    dispatch: AppDispatch;
+    state: State;
+    extra: AxiosInstance;
+}>(
+    'data/fetchFavoriteOffers',
+    async (_arg, { dispatch, extra: api }) => {
+        dispatch(setFavoriteOfferDataLoadingStatus(true));
+        try {
+            const { data } = await api.get(APIRoute.Favorite);
+
+            const mappedOffers = data.map((offer: any) => ({
+                id: String(offer.id),
+                title: offer.title,
+                type: offer.type,
+                price: offer.price,
+                city: offer.city,
+                location: offer.location,
+                isFavorite: offer.favorite,
+                isPremium: offer.premium,
+                rating: offer.rating,
+                previewImage: offer.previewImage,
+            }));
+
+            dispatch(favoriteOffer(mappedOffers));
+        } finally {
+            dispatch(setFavoriteOfferDataLoadingStatus(false));
         }
     },
 );
@@ -259,5 +304,8 @@ export {
     clearErrorAction,
     fetchFullOfferAction,
     fetchReviewsAction,
-    sendReviewAction
+    sendReviewAction,
+    fetchFavoriteOffersAction
 };
+
+

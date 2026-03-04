@@ -16,6 +16,10 @@ const fullOffer = createAction('offers/fullOffer', (offer: FullOffer) => ({
     payload: offer
 }))
 
+const favoriteOffer = createAction('offers/favoriteOffer', (offer: OffersList[]) => ({
+    payload: offer
+}));
+
 const requireAuthorization = createAction<AuthorizationStatusType>('user/requireAuthorization');
 
 const setError = createAction('setError', (error: string | null) => ({
@@ -24,6 +28,7 @@ const setError = createAction('setError', (error: string | null) => ({
 
 const setOffersDataLoadingStatus = createAction<boolean>('data/setOffersDataLoadingStatus');
 const setFullOfferDataLoadingStatus = createAction<boolean>('data/setFullOfferDataLoadingStatus');
+const setFavoriteOfferDataLoadingStatus = createAction<boolean>('data/setFavoriteOfferDataLoadingStatus');
 
 const setUserData = createAction<UserData | null>('user/setUserData');
 
@@ -50,6 +55,8 @@ export {
     setFullOfferDataLoadingStatus,
     setReviews,
     setReviewsDataLoadingStatus,
-    setReviewSendingStatus, 
-    addReview
+    setReviewSendingStatus,
+    addReview,
+    favoriteOffer,
+    setFavoriteOfferDataLoadingStatus,
 };
