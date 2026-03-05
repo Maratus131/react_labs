@@ -44,6 +44,10 @@ const addReview = createAction('data/addReview', (review: Review) => ({
     payload: review
 }));
 
+const toogleFavoriteOffer = createAction('offers/toogleFavoriteOffer', (offer: OffersList) => ({
+    payload: offer
+}));
+
 export {
     changeCity,
     offersCityList,
@@ -59,4 +63,5 @@ export {
     addReview,
     favoriteOffer,
     setFavoriteOfferDataLoadingStatus,
+    toogleFavoriteOffer
 };

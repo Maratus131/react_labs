@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { AppRoute } from "../../const";
 import { Link } from "react-router-dom";
+import { AppRoute, AuthorizationStatus } from "../../const";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { toggleFavoriteOfferAction } from "../../store/api-action";
 
 type FavoritesCardProps = {
     id: string;
@@ -10,11 +11,22 @@ type FavoritesCardProps = {
     isPremium: boolean;
     previewImage: string;
     rating: number;
+    isFavorite: boolean;
 }
 
-function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating }: FavoritesCardProps) {
+function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating, isFavorite }: FavoritesCardProps) {
     const ratingPercent = Math.round(rating * 20);
-    const [, setOfferId] = useState('');
+    const dispatch = useAppDispatch();
+    const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
+    const isAuthorized = authorizationStatus === AuthorizationStatus.Auth;
+
+    const handleFavoriteClick = () => {
+        dispatch(toggleFavoriteOfferAction({
+            offerId: id,
+            status: isFavorite ? 0 : 1
+        }));
+    };
+
     return (
         <article className="favorites__card place-card">
             {isPremium && (
@@ -33,12 +45,18 @@ function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating
                         <b className="place-card__price-value">&euro;{price}</b>
                         <span className="place-card__price-text">&#47;&nbsp;night</span>
                     </div>
-                    <button className="place-card__bookmark-button place-card__bookmark-button--active button" type="button">
-                        <svg className="place-card__bookmark-icon" width="18" height="19">
-                            <use href="#icon-bookmark"></use>
-                        </svg>
-                        <span className="visually-hidden">In bookmarks</span>
-                    </button>
+                    {isAuthorized && (
+                        <button
+                            onClick={handleFavoriteClick}
+                            className={`place-card__bookmark-button ${isFavorite ? 'place-card__bookmark-button--active' : ''} button`}
+                            type="button"
+                        >
+                            <svg className="place-card__bookmark-icon" width="18" height="19">
+                                <use xlinkHref="#icon-bookmark"></use>
+                            </svg>
+                            <span className="visually-hidden">{isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
+                        </button>
+                    )}
                 </div>
                 <div className="place-card__rating rating">
                     <div className="place-card__stars rating__stars">
@@ -47,7 +65,7 @@ function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating
                     </div>
                 </div>
                 <h2 className="place-card__name">
-                    <a href={`/offer/${id}`}>{title}</a>
+                    <Link to={`${AppRoute.Offer}/${id}`}>{title}</Link>
                 </h2>
                 <p className="place-card__type">{type}</p>
             </div>
@@ -55,4 +73,4 @@ function FavoritesCard({ id, title, type, price, previewImage, isPremium, rating
     );
 }
 
-export { FavoritesCard }
+export { FavoritesCard };

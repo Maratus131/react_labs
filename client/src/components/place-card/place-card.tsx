@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
-import { AppRoute } from "../../const";
+import { AppRoute, AuthorizationStatus } from "../../const";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { toggleFavoriteOfferAction } from "../../store/api-action";
 
 type PlaceCardProps = {
   id: string;
@@ -37,6 +39,16 @@ function PlaceCard({
   onMouseLeave
 }: PlaceCardProps) {
   const ratingPercent = Math.round(rating * 20);
+  const dispatch = useAppDispatch();
+  const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
+  const isAuthorized = authorizationStatus === AuthorizationStatus.Auth;
+
+  const handleFavoriteClick = () => {
+    dispatch(toggleFavoriteOfferAction({
+      offerId: id,
+      status: isFavorite ? 0 : 1
+    }));
+  };
 
   return (
     <article
@@ -65,16 +77,24 @@ function PlaceCard({
       <div className="place-card__info">
         <div className="place-card__price-wrapper">
           <div className="place-card__price">
-            <b className="place-card__price-value">€{price}</b>
+            <b className="place-card__price-value">&euro;{price}</b>
             <span className="place-card__price-text">/ night</span>
           </div>
-          <button className={`place-card__bookmark-button ${isFavorite ? 'place-card__bookmark-button--active' : ''} button`} type="button">
-            <svg className="place-card__bookmark-icon" width="18" height="19">
-              <use xlinkHref="#icon-bookmark"></use>
-            </svg>
-            <span className="visually-hidden">{isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
-          </button>
+
+          {isAuthorized && (
+            <button
+              onClick={handleFavoriteClick}
+              className={`place-card__bookmark-button ${isFavorite ? 'place-card__bookmark-button--active' : ''} button`}
+              type="button"
+            >
+              <svg className="place-card__bookmark-icon" width="18" height="19">
+                <use xlinkHref="#icon-bookmark"></use>
+              </svg>
+              <span className="visually-hidden">{isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
+            </button>
+          )}
         </div>
+
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
             <span style={{ width: `${ratingPercent}%` }}></span>

@@ -1,11 +1,12 @@
 import { createReducer } from "@reduxjs/toolkit";
 import { AuthorizationStatus, CITIES_LOCATION } from "../const";
 import { getCity } from "../utils";
-import { addReview, changeCity, favoriteOffer, fullOffer, offersCityList, requireAuthorization, setError, setFavoriteOfferDataLoadingStatus, setFullOfferDataLoadingStatus, setOffersDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, setUserData } from "./action";
+import { addReview, changeCity, favoriteOffer, fullOffer, offersCityList, requireAuthorization, setError, setFavoriteOfferDataLoadingStatus, setFullOfferDataLoadingStatus, setOffersDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, setUserData, toogleFavoriteOffer } from "./action";
 import { CityOffer, FullOffer, OffersList } from "../types/offer";
 import { AuthorizationStatusType } from "../types/authorization-status";
 import { UserData } from "../types/user-data";
 import { Review } from "../types/reviews";
+import { toggleFavoriteOfferAction } from "./api-action";
 
 const defaultCity = getCity('Paris', CITIES_LOCATION);
 
@@ -84,7 +85,18 @@ const reducer = createReducer(initialState, (builder) => {
         })
         .addCase(favoriteOffer, (state, action) => {
             state.favoriteOffers = action.payload;
-        });
+        })
+        .addCase(toogleFavoriteOffer, (state, action) => {
+            const updatedOffer = action.payload;
+
+            state.offers = state.offers.map((offer) =>
+                offer.id === updatedOffer.id ? updatedOffer : offer
+            );
+
+            if (state.fullOffer && state.fullOffer.id === updatedOffer.id) {
+                state.fullOffer.isFavorite = updatedOffer.isFavorite;
+            }
+        })
 
 });
 

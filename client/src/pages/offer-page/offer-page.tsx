@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { NotFoundPage } from "../not-found-page/not-found-page";
 import { ReviewsForm } from "../../components/reviews-form/reviews-form";
@@ -6,12 +6,11 @@ import { ReviewsList } from "../../components/reviews-list/reviews-list";
 import Map from "../../components/map/map";
 import { NearPlacesCardList } from "../../components/near-places-list/near-places-list";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { fetchFullOfferAction, fetchReviewsAction } from "../../store/api-action";
+import { fetchFullOfferAction, fetchReviewsAction, toggleFavoriteOfferAction } from "../../store/api-action";
 import { OffersList } from "../../types/offer";
 import AppHeader from "../../components/app-header/app-header";
 import { AuthorizationStatus } from "../../const";
 import LoadingPage from "../../components/loading-page/loading-page";
-
 
 function OfferPage() {
     const { id } = useParams<{ id: string }>();
@@ -21,6 +20,7 @@ function OfferPage() {
     const offer = useAppSelector((state) => state.fullOffer);
     const isFullOfferDataLoading = useAppSelector((state) => state.isFullOfferDataLoading);
     const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
+    const isAuthorized = authorizationStatus === AuthorizationStatus.Auth;
 
     useEffect(() => {
         if (id) {
@@ -36,6 +36,13 @@ function OfferPage() {
     if (!offer) {
         return <NotFoundPage />;
     }
+
+    const handleFavoriteClick = () => {
+        dispatch(toggleFavoriteOfferAction({
+            offerId: offer.id,
+            status: offer.isFavorite ? 0 : 1,
+        }));
+    };
 
     const ratingPercent = Math.round(offer.rating * 20);
 
@@ -96,12 +103,18 @@ function OfferPage() {
                             )}
                             <div className="offer__name-wrapper">
                                 <h1 className="offer__name">{offer.title}</h1>
-                                <button className="offer__bookmark-button button" type="button">
-                                    <svg className="offer__bookmark-icon" width="31" height="33">
-                                        <use xlinkHref="#icon-bookmark"></use>
-                                    </svg>
-                                    <span className="visually-hidden">To bookmarks</span>
-                                </button>
+                                {isAuthorized && (
+                                    <button
+                                        onClick={handleFavoriteClick}
+                                        className={`offer__bookmark-button ${offer.isFavorite ? 'offer__bookmark-button--active' : ''} button`}
+                                        type="button"
+                                    >
+                                        <svg className="offer__bookmark-icon" width="31" height="33">
+                                            <use xlinkHref="#icon-bookmark"></use>
+                                        </svg>
+                                        <span className="visually-hidden">{offer.isFavorite ? 'In bookmarks' : 'To bookmarks'}</span>
+                                    </button>
+                                )}
                             </div>
                             <div className="offer__rating rating">
                                 <div className="offer__stars rating__stars">
@@ -118,7 +131,7 @@ function OfferPage() {
                             </ul>
 
                             <div className="offer__price">
-                                <b className="offer__price-value">€{offer.price}</b>
+                                <b className="offer__price-value">&euro;{offer.price}</b>
                                 <span className="offer__price-text">&nbsp;night</span>
                             </div>
 
@@ -153,14 +166,12 @@ function OfferPage() {
 
                             <section className="offer__reviews reviews">
                                 <ReviewsList />
-                                {authorizationStatus === AuthorizationStatus.Auth ?
-                                    <ReviewsForm /> : <></>}
+                                {isAuthorized ? <ReviewsForm /> : <></>}
                             </section>
                         </div>
                     </div>
 
-                    <section
-                        className="offer__map map">
+                    <section className="offer__map map">
                         <Map city={city} points={points} />
                     </section>
                 </section>
@@ -172,7 +183,7 @@ function OfferPage() {
                     </section>
                 </div>
             </main>
-        </div >
+        </div>
     );
 }
 

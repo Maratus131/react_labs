@@ -1,8 +1,8 @@
 import { AxiosInstance } from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, State } from "../types/state";
-import { FullOffer } from "../types/offer";
-import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData, fullOffer, setFullOfferDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, addReview, favoriteOffer, setFavoriteOfferDataLoadingStatus } from "./action";
+import { FullOffer, OffersList } from "../types/offer";
+import { offersCityList, requireAuthorization, setError, setOffersDataLoadingStatus, setUserData, fullOffer, setFullOfferDataLoadingStatus, setReviews, setReviewsDataLoadingStatus, setReviewSendingStatus, addReview, favoriteOffer, setFavoriteOfferDataLoadingStatus, toogleFavoriteOffer } from "./action";
 import { AuthorizationStatus, TIMEOUT_SHOW_ERROR } from "../const";
 import { dropToken, saveToken } from "../services/token";
 import { APIRoute } from "../const";
@@ -34,7 +34,7 @@ const fetchFullOfferAction = createAsyncThunk<
                 price: data.price,
                 city: data.city,
                 location: data.location,
-                isFavorite: data.favorite,
+                isFavorite: data.favorite ?? data.isFavorite,
                 isPremium: data.premium,
                 rating: data.rating,
                 description: data.description,
@@ -80,7 +80,7 @@ const fetchOffersAction = createAsyncThunk<void, undefined, {
                 price: offer.price,
                 city: offer.city,
                 location: offer.location,
-                isFavorite: offer.favorite,
+                isFavorite: offer.favorite ?? offer.isFavorite,
                 isPremium: offer.premium,
                 rating: offer.rating,
                 previewImage: offer.previewImage,
@@ -111,7 +111,7 @@ const fetchFavoriteOffersAction = createAsyncThunk<void, undefined, {
                 price: offer.price,
                 city: offer.city,
                 location: offer.location,
-                isFavorite: offer.favorite,
+                isFavorite: offer.favorite ?? offer.isFavorite,
                 isPremium: offer.premium,
                 rating: offer.rating,
                 previewImage: offer.previewImage,
@@ -296,10 +296,45 @@ const sendReviewAction = createAsyncThunk<
     }
 );
 
+const toggleFavoriteOfferAction = createAsyncThunk<
+  OffersList,
+  { offerId: string; status: number },
+  {
+    dispatch: AppDispatch;
+    state: State;
+    extra: AxiosInstance;
+  }
+>(
+  'data/toggleFavoriteOffer',
+  async ({ offerId, status }, { dispatch, extra: api }) => {
+
+    const { data } = await api.post(`${APIRoute.Favorite}/${offerId}/${status}`);
+
+    const mappedOffer: OffersList = {
+      id: String(data.id),
+      title: data.title,
+      type: data.type,
+      price: data.price,
+      city: data.city,
+      location: data.location,
+      isFavorite: data.favorite ?? data.isFavorite,
+      isPremium: data.premium,
+      rating: data.rating,
+      previewImage: data.previewImage,
+    };
+
+    dispatch(toogleFavoriteOffer(mappedOffer));
+    dispatch(fetchFavoriteOffersAction());
+
+    return mappedOffer;
+  }
+);
+
 export {
     fetchOffersAction,
     checkAuthAction,
     loginAction,
+    toggleFavoriteOfferAction,
     logoutAction,
     clearErrorAction,
     fetchFullOfferAction,
@@ -307,5 +342,8 @@ export {
     sendReviewAction,
     fetchFavoriteOffersAction
 };
+
+
+
 
 
