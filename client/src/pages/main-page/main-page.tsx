@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
 import Map from "../../components/map/map";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { getFavoritesLength, getOffersByCity, sortOffersByType } from "../../utils";
+import { getOffersByCity, sortOffersByType } from "../../utils";
 import { CitiesList } from "../../components/cities-list/cities-list";
 import { SortOffer } from "../../types/sort";
 import { SortOptions } from "../../components/sort-options/sort-options";

@@ -1,8 +1,12 @@
+import { Link } from "react-router-dom"
+import { Logo } from "../../components/logo/logo"
+
 function NotFoundPage() {
     return (
         <div className="page page--gray page--not-found">
             <main className="page__main page__main--not-found">
                 <div className="container">
+                    <Logo />
                     <section className="not-found">
                         <h1 className="not-found__title">404. Page not found</h1>
                         <p className="not-found__text">

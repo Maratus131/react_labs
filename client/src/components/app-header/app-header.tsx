@@ -33,7 +33,7 @@ function AppHeader() {
                                 authorizationStatus === AuthorizationStatus.Auth ? (
                                     <>
                                         <li className="header__nav-item user">
-                                            <a className="header__nav-link header__nav-link--profile" href="#">
+                                            <div className="header__nav-link header__nav-link--profile">
                                                 <div className="header__avatar-wrapper user__avatar-wrapper">
                                                     <img src={userData?.avatar} />
                                                 </div>
@@ -43,15 +43,15 @@ function AppHeader() {
                                                 <Link to="/favorites">
                                                     <span className="header__favorite-count">{favoriteLength}</span>
                                                 </Link>
-                                            </a>
+                                            </div>
                                         </li>
-                                        <a
+                                        <Link
                                             className="header__nav-link"
-                                            href="/"
+                                            to="/"
                                             onClick={onClickLogout}
                                         >
                                             <span className="header__signout">Sign out</span>
-                                        </a>
+                                        </Link>
                                     </>
                                 ) : (
                                     <li className="header__nav-item">

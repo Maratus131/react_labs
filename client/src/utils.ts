@@ -14,10 +14,6 @@ export function getFavoritesOffers(offers: OffersList[]): OffersList[] | undefin
     return offers.filter((offer) => offer.isFavorite)
 }
 
-export function getFavoritesLength(offers: OffersList[]){
-    return offers.filter((offer) => offer.isFavorite).length
-}
-
 export function sortOffersByType(offers: OffersList[], type: SortOffer): OffersList[] {
     switch (type) {
         case SortOffersType.PriceToHigh:
