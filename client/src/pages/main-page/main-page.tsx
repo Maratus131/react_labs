@@ -55,9 +55,11 @@ function MainPage() {
         setSelectedOfferId(offerId);
     };
 
+    const isEmpty = selectedCityOffers.length === 0;
+
     return (
         <div className="page page--gray page--main">
-           <AppHeader/>
+            <AppHeader />
 
             <main className="page__main page__main--index">
                 <h1 className="visually-hidden">Cities</h1>
@@ -70,12 +72,22 @@ function MainPage() {
                     <div className="cities__places-container container">
                         <section className="cities__places places">
                             <h2 className="visually-hidden">Places</h2>
-                            <SortOptions activeSorting={activeSort} onChange={(newSorting) => setActiveSort(newSorting)} />
-                            <b className="places__found">{rentalOffersCount} places to stay in {selectedCity?.name}</b>
-                            <CitiesCardList
-                                offersList={sortOffersByType(selectedCityOffers, activeSort)}
-                                onListItemHover={handleListItemHover}
-                            />
+                            {isEmpty ? (
+                                <div className="cities__status-wrapper tabs__content">
+                                    <b className="cities__status">No places to stay available</b>
+                                    <p className="cities__status-description">We could not find any property available at the moment in {selectedCity?.name}</p>
+                                </div>
+                            ) : (
+                                <>
+
+                                    <SortOptions activeSorting={activeSort} onChange={(newSorting) => setActiveSort(newSorting)} />
+                                    <b className="places__found">{rentalOffersCount} places to stay in {selectedCity?.name}</b>
+                                    <CitiesCardList
+                                        offersList={sortOffersByType(selectedCityOffers, activeSort)}
+                                        onListItemHover={handleListItemHover}
+                                    />
+                                </>
+                            )}
                         </section>
                         <div className="cities__right-section">
                             <section className="cities__map map">

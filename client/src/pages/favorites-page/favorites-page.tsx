@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FavoritesCardList } from "../../components/favorites-card-list/favorites-card-list";
-import { Logo } from "../../components/logo/logo";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { fetchFavoriteOffersAction } from "../../store/api-action";
 import { OffersList } from "../../types/offer";
@@ -42,7 +41,10 @@ function FavoritesPage() {
                         <h1 className="favorites__title">Saved listing</h1>
 
                         {isEmpty ? (
-                            <p>No saved offers yet</p>
+                            <div className="favorites__status-wrapper">
+                                <b className="favorites__status">Nothing yet saved.</b>
+                                <p className="favorites__status-description">Save properties to narrow down search or plan your future trips.</p>
+                            </div>
                         ) : (
                             <ul className="favorites__list">
                                 {Object.entries(groupedFavorites).map(
